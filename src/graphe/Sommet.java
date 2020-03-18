@@ -2,24 +2,18 @@ package graphe;
 
 public class Sommet {
     public final int id;
-    public final int valeurInt;
-    public final String valeurString;
+    public final String valeur;
 
-    public Sommet(int id, int valeurInt, String valeurString) {
+    public Sommet(int id, String valeur) {
         this.id = id;
-        this.valeurInt = valeurInt;
-        this.valeurString = valeurString;
+        this.valeur = valeur;
     }
 
     public int getId() {
         return id;
     }
 
-    public int getValeurInt() {
-        return valeurInt;
-    }
-
-    public String getValeurString() {
-        return valeurString;
+    public String getValeur() {
+        return valeur;
     }
 }
