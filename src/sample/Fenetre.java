@@ -6,15 +6,13 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 import java.util.Optional;
@@ -24,13 +22,16 @@ public class Fenetre extends Parent {
     private BorderPane border = new BorderPane();
 
     public Fenetre() {
+        // Images de l'application
         Image imageAjouter = new Image(getClass().getResourceAsStream("../assets/icons/plus.png"));
         Image imageFichier = new Image(getClass().getResourceAsStream("../assets/icons/folder.png"));
         Image imageQuitter = new Image(getClass().getResourceAsStream("../assets/icons/quit.png"));
 
+        // Création de la barre de menu
         MenuBar menuBar = new MenuBar();
         Menu menu = new Menu("Menu");
 
+        // Création des éléments du menu
         MenuItem menuCreer = new MenuItem("Créer un nouveau graphe", new ImageView(imageAjouter));
         menuCreer.setOnAction(
                 new EventHandler<ActionEvent>() {
@@ -39,13 +40,17 @@ public class Fenetre extends Parent {
                     }
                 }
         );
+
+        // Ajout des éléments au menu
         menu.getItems().add(menuCreer);
         menu.getItems().add(new MenuItem("Ouvrir depuis un fichier", new ImageView(imageFichier)));
         menu.getItems().add(new MenuItem("Quitter", new ImageView(imageQuitter)));
         menuBar.getMenus().add(menu);
 
+        // Ajout du menu au layout racine
         border.setTop(menuBar);
 
+        // Création du layout "Aucun graphe"
         VBox vbox = new VBox();
         Text text = new Text("Aucun graphe n'est actuellement ouvert");
         Button bCreer = new Button("Créer un nouveau graphe", new ImageView(imageAjouter));
@@ -56,12 +61,15 @@ public class Fenetre extends Parent {
                     }
                 }
         );
+
+        // Ajout du layout "Aucun graphe" au layout vbox
         vbox.getChildren().add(text);
         vbox.getChildren().add(bCreer);
         vbox.setSpacing(10);
 
         vbox.setAlignment(Pos.CENTER);
 
+        // Ajout du layout vbox au layout racine
         border.setCenter(vbox);
     }
 
@@ -69,17 +77,28 @@ public class Fenetre extends Parent {
         if (graphe == null) {
             graphe = new Graphe();
             border.setCenter(graphe);
-            FlowPane flow = new FlowPane();
-            flow.setPadding(new Insets(5, 0, 5, 0));
-            flow.setVgap(4);
-            flow.setHgap(4);
-            flow.setPrefWrapLength(170); // preferred width allows for two columns
+            HBox flow = new HBox();
+            flow.setPadding(new Insets(10, 0, 10, 10));
+            flow.setSpacing(10); // preferred width allows for two columns
             flow.setStyle("-fx-background-color: DAE6F3;");
-            flow.setAlignment(Pos.TOP_CENTER);
-            Image imageFichier = new Image(getClass().getResourceAsStream("../assets/icons/pin.png"));
+            Image imageSommet = new Image(getClass().getResourceAsStream("../assets/icons/pin.png"));
+            Image imageArc = new Image(getClass().getResourceAsStream("../assets/icons/link.png"));
 
-            flow.getChildren().add(new Button("Créer un sommet", new ImageView(imageFichier)));
-            border.setLeft(flow);
+            Button bSommet = new Button("Créer un sommet", new ImageView(imageSommet));
+            Button bArc = new Button("Créer un arc", new ImageView(imageArc));
+
+            bSommet.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                public void handle(MouseEvent t) {
+                }
+            });
+            bArc.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                public void handle(MouseEvent t) {
+                }
+            });
+
+            flow.getChildren().add(bSommet);
+            flow.getChildren().add(bArc);
+            border.setBottom(flow);
         } else {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Confirmer la création");
