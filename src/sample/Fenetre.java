@@ -20,6 +20,10 @@ import java.util.Optional;
 public class Fenetre extends Parent {
     private Graphe graphe;
     private BorderPane border = new BorderPane();
+    private ScrollPane scrollPane = new ScrollPane();
+
+    public static boolean creerSommetsEnclenche;
+    public static boolean creerArcsEnclenche;
 
     public Fenetre() {
         // Images de l'application
@@ -71,12 +75,23 @@ public class Fenetre extends Parent {
 
         // Ajout du layout vbox au layout racine
         border.setCenter(vbox);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+    }
+
+    public ScrollPane getScrollPane() {
+        return scrollPane;
     }
 
     public void setGraphe() {
         if (graphe == null) {
-            graphe = new Graphe();
-            border.setCenter(graphe);
+            graphe = new Graphe("Sans nom");
+            scrollPane.setContent(graphe);
+            scrollPane.setStyle("-fx-background-color: lightgray, white ;" +
+                    "    -fx-background-insets: 0, 5 ;");
+            border.setCenter(scrollPane);
             HBox flow = new HBox();
             flow.setPadding(new Insets(10, 0, 10, 10));
             flow.setSpacing(10); // preferred width allows for two columns
@@ -84,15 +99,17 @@ public class Fenetre extends Parent {
             Image imageSommet = new Image(getClass().getResourceAsStream("../assets/icons/pin.png"));
             Image imageArc = new Image(getClass().getResourceAsStream("../assets/icons/link.png"));
 
-            Button bSommet = new Button("Créer un sommet", new ImageView(imageSommet));
-            Button bArc = new Button("Créer un arc", new ImageView(imageArc));
+            ToggleButton bSommet = new ToggleButton("Créer des sommets", new ImageView(imageSommet));
+            ToggleButton bArc = new ToggleButton("Créer des arcs", new ImageView(imageArc));
 
             bSommet.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent t) {
+                    Fenetre.creerSommetsEnclenche = bSommet.isSelected();
                 }
             });
             bArc.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent t) {
+                    Fenetre.creerArcsEnclenche = bArc.isSelected();
                 }
             });
 
