@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -99,17 +100,36 @@ public class Fenetre extends Parent {
             Image imageSommet = new Image(getClass().getResourceAsStream("../assets/icons/pin.png"));
             Image imageArc = new Image(getClass().getResourceAsStream("../assets/icons/link.png"));
 
+            ToggleGroup group = new ToggleGroup();
             ToggleButton bSommet = new ToggleButton("Créer des sommets", new ImageView(imageSommet));
             ToggleButton bArc = new ToggleButton("Créer des arcs", new ImageView(imageArc));
+            bSommet.setToggleGroup(group);
+            bArc.setToggleGroup(group);
 
             bSommet.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent t) {
+                    if(bSommet.isSelected()) {
+                        graphe.setCursor(Cursor.CROSSHAIR);
+                    } else {
+                        graphe.setCursor(Cursor.DEFAULT);
+                    }
                     Fenetre.creerSommetsEnclenche = bSommet.isSelected();
+                    if (!bSommet.isSelected() && !bArc.isSelected()) {
+                        Fenetre.creerArcsEnclenche = false;
+                    } else {
+                        Fenetre.creerArcsEnclenche = !bSommet.isSelected();
+                    }
                 }
             });
             bArc.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 public void handle(MouseEvent t) {
+                    graphe.setCursor(Cursor.DEFAULT);
                     Fenetre.creerArcsEnclenche = bArc.isSelected();
+                    if (!bArc.isSelected() && !bSommet.isSelected()) {
+                        Fenetre.creerSommetsEnclenche = false;
+                    } else {
+                        Fenetre.creerSommetsEnclenche = !bArc.isSelected();
+                    }
                 }
             });
 

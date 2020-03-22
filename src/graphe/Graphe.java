@@ -1,65 +1,41 @@
 package graphe;
 
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.control.Alert;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 import sample.Fenetre;
 
 import java.util.ArrayList;
 
 public class Graphe extends Parent {
     private ArrayList<Sommet> sommets = new ArrayList<>();
-    private Arc[] arcs;
+    private ArrayList<Arc> arcs = new ArrayList<>();
     private String nom;
+    private Sommet premierSommetRelie = null;
+    public static int idIncrement = 1;
+
+    private Pane pane;
 
     public Graphe(String nom) {
         this.nom = nom;
-        Pane pane = new Pane();
+        pane = new Pane();
         pane.setStyle("-fx-background-color:lightgray");
         pane.setPrefWidth(1277);
         pane.setPrefHeight(670);
         pane.setOnMouseClicked(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent t) {
                 // Si on clique sur un sommet avec un clic gauche avec le bouton "Créer des sommets" enclenché :
-                if (!(t.getPickResult().getIntersectedNode() instanceof Circle) && Fenetre.creerSommetsEnclenche &&
+                if (!(t.getPickResult().getIntersectedNode() instanceof Circle ||
+                        t.getPickResult().getIntersectedNode() instanceof Text) && Fenetre.creerSommetsEnclenche &&
                         t.getButton() == MouseButton.PRIMARY) {
                     // Création du nouveau sommet
-                    Sommet s = new Sommet(sommets.size() + 1, t.getX(), t.getY(), "test");
-
-                    // Création du menu contextuel lorsqu'on clique droit sur un sommet
-                    ContextMenu contextMenu = new ContextMenu();
-                    Image imagePoubelle = new Image(getClass().getResourceAsStream("../assets/icons/trash.png"));
-                    Image imageEdit = new Image(getClass().getResourceAsStream("../assets/icons/pencil.png"));
-                    MenuItem item1 = new MenuItem("Supprimer", new ImageView(imagePoubelle));
-                    MenuItem item2 = new MenuItem("Renommer", new ImageView(imageEdit));
-
-                    // Gestion du clic Supprimer
-                    item1.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                            sommets.remove(s);
-                            pane.getChildren().remove(s);
-                        }
-                    });
-                    contextMenu.getItems().addAll(item1, item2);
-
-                    // Gestion du clic droit
-                    s.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
-                        @Override
-                        public void handle(ContextMenuEvent event) {
-                            contextMenu.show(s, event.getScreenX(), event.getScreenY());
-                        }
-                    });
-
+                    Sommet s = new Sommet(idIncrement, t.getX(), t.getY(), "test", Graphe.this);
+                    idIncrement++;
                     // Ajout du sommet dans notre liste sommets et dans le pane
                     sommets.add(s);
                     pane.getChildren().add(s);
@@ -68,5 +44,40 @@ public class Graphe extends Parent {
         });
 
         this.getChildren().add(pane);
+    }
+
+    public ArrayList<Arc> getArcs() {
+        return arcs;
+    }
+
+    public boolean ajouterArc(Arc arc) {
+        for (Arc a : arcs) {
+            if (a.depart.id == arc.depart.id && a.arrivee.id == arc.arrivee.id) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Impossible de créer l'arc");
+                alert.setHeaderText("Le sommet " + a.depart.id + " est déjà relié au sommet " + a.arrivee.id + " !");
+                alert.showAndWait();
+                premierSommetRelie = null;
+                return false;
+            }
+        }
+        arcs.add(arc);
+        return true;
+    }
+
+    public ArrayList<Sommet> getSommets() {
+        return sommets;
+    }
+
+    public Sommet getPremierSommetRelie() {
+        return premierSommetRelie;
+    }
+
+    public void setPremierSommetRelie(Sommet premierSommetRelie) {
+        this.premierSommetRelie = premierSommetRelie;
+    }
+
+    public Pane getPane() {
+        return pane;
     }
 }
