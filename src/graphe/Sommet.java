@@ -21,13 +21,11 @@ public class Sommet extends Parent {
     public final int id;
     public final String valeur;
     static public final double SOMMET_RADIUS = 20;
-    
+    double orgSceneX, orgSceneY;
     private Circle cercle;
     private StackPane stackPane;
-    private Graphe graphe;
 
     public Sommet(int id, double x, double y, String valeur, Graphe graphe) {
-        this.graphe = graphe;
         this.id = id;
         this.valeur = valeur;
 
@@ -47,11 +45,23 @@ public class Sommet extends Parent {
         stackPane.setLayoutX(x - 20);
         stackPane.setLayoutY(y - 20);
         stackPane.setCursor(Cursor.HAND);
+
+        stackPane.setOnMousePressed((t) -> {
+            orgSceneX = t.getSceneX();
+            orgSceneY = t.getSceneY();
+        });
+
+        // Gestion du déplacement d'un sommet
         stackPane.setOnMouseDragged((t) -> {
-            double offsetX = t.getSceneX();
-            double offsetY = t.getSceneY();
-            stackPane.setLayoutX(offsetX - 20);
-            stackPane.setLayoutY(offsetY - 43);
+            double offsetX = t.getSceneX() - orgSceneX;
+            double offsetY = t.getSceneY() - orgSceneY;
+
+            stackPane.setLayoutX(stackPane.getLayoutX() + offsetX);
+            stackPane.setLayoutY(stackPane.getLayoutY() + offsetY);
+
+            orgSceneX = t.getSceneX();
+            orgSceneY = t.getSceneY();
+
             for (Arc arc : graphe.getArcs()) {
                 arc.setLine();
                 arc.getArrow().update();
