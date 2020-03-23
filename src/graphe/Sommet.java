@@ -35,17 +35,10 @@ public class Sommet extends Parent {
         cercle.setStrokeWidth(2);
         cercle.setFill(Color.LIGHTBLUE);
 
-        cercle.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            public void handle(MouseEvent t) {
-
-            }
-        });
-        stackPane.getChildren().add(cercle);
-        stackPane.getChildren().add(new Text(this.id + ""));
-        stackPane.setLayoutX(x - 20);
-        stackPane.setLayoutY(y - 20);
+        stackPane.getChildren().addAll(cercle, new Text(this.id + ""));
+        stackPane.setLayoutX(x - 23);
+        stackPane.setLayoutY(y - 43);
         stackPane.setCursor(Cursor.HAND);
-
         stackPane.setOnMousePressed((t) -> {
             orgSceneX = t.getSceneX();
             orgSceneY = t.getSceneY();

@@ -34,7 +34,7 @@ public class Graphe extends Parent {
                         t.getPickResult().getIntersectedNode() instanceof Text) && Fenetre.creerSommetsEnclenche &&
                         t.getButton() == MouseButton.PRIMARY) {
                     // Création du nouveau sommet
-                    Sommet s = new Sommet(idIncrement, t.getSceneX() - 3, t.getSceneY() - 30, "test", Graphe.this);
+                    Sommet s = new Sommet(idIncrement, t.getSceneX(), t.getSceneY(), "test", Graphe.this);
                     idIncrement++;
                     // Ajout du sommet dans notre liste sommets et dans le pane
                     sommets.add(s);
