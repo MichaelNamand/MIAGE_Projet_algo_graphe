@@ -18,15 +18,13 @@ import sample.ArrowSecond;
 import static graphe.Sommet.SOMMET_RADIUS;
 
 public class Arc extends Parent {
-    public final int cout;
-    public final Sommet depart;
-    public final Sommet arrivee;
+    private final int cout;
+    private final Sommet depart;
+    private final Sommet arrivee;
     private ArrowSecond arrow;
     private Line line;
-    private Graphe graphe;
 
     public Arc(int cout, Sommet depart, Sommet arrivee, Graphe graphe) {
-        this.graphe = graphe;
         this.cout = cout;
         this.depart = depart;
         this.arrivee = arrivee;
@@ -37,7 +35,7 @@ public class Arc extends Parent {
                 if (t.getButton() == MouseButton.SECONDARY) {
                     // Création du menu contextuel lorsqu'on clique droit sur un sommet
                     ContextMenu contextMenu = new ContextMenu();
-                    Image imagePoubelle = new Image(getClass().getResourceAsStream("../assets/icons/trash.png"));
+                    Image imagePoubelle = new Image(getClass().getResourceAsStream("/assets/icons/trash.png"));
                     MenuItem item1 = new MenuItem("Supprimer", new ImageView(imagePoubelle));
 
                     // Gestion du clic Supprimer

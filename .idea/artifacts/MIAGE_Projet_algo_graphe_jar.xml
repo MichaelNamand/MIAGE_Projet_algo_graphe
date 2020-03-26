@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="MIAGE_Projet_algo_graphe:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/MIAGE_Projet_algo_graphe_jar</output-path>
+    <root id="archive" name="MIAGE_Projet_algo_graphe.jar">
+      <element id="module-output" name="MIAGE_Projet_algo_graphe" />
+    </root>
+  </artifact>
+</component>

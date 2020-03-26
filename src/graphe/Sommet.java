@@ -21,39 +21,38 @@ public class Sommet extends Parent {
     public final int id;
     public final String valeur;
     static public final double SOMMET_RADIUS = 20;
-    double orgSceneX, orgSceneY;
+    double x, y;
     private Circle cercle;
     private StackPane stackPane;
 
     public Sommet(int id, double x, double y, String valeur, Graphe graphe) {
         this.id = id;
         this.valeur = valeur;
-
+        this.x = x; this.y = y;
         stackPane = new StackPane();
         cercle = new Circle(20);
         cercle.setStroke(Color.BLACK);
         cercle.setStrokeWidth(2);
         cercle.setFill(Color.LIGHTBLUE);
-
         stackPane.getChildren().addAll(cercle, new Text(this.id + ""));
         stackPane.setLayoutX(x - 23);
         stackPane.setLayoutY(y - 43);
         stackPane.setCursor(Cursor.HAND);
         stackPane.setOnMousePressed((t) -> {
-            orgSceneX = t.getSceneX();
-            orgSceneY = t.getSceneY();
+            this.x = t.getSceneX();
+            this.y = t.getSceneY();
         });
 
         // Gestion du déplacement d'un sommet
         stackPane.setOnMouseDragged((t) -> {
-            double offsetX = t.getSceneX() - orgSceneX;
-            double offsetY = t.getSceneY() - orgSceneY;
+            double offsetX = t.getSceneX() - this.x;
+            double offsetY = t.getSceneY() - this.y;
 
             stackPane.setLayoutX(stackPane.getLayoutX() + offsetX);
             stackPane.setLayoutY(stackPane.getLayoutY() + offsetY);
 
-            orgSceneX = t.getSceneX();
-            orgSceneY = t.getSceneY();
+            this.x = t.getSceneX();
+            this.y = t.getSceneY();
 
             for (Arc arc : graphe.getArcs()) {
                 arc.setLine();
@@ -62,8 +61,8 @@ public class Sommet extends Parent {
         });
         // Création du menu contextuel lorsqu'on clique droit sur un sommet
         ContextMenu contextMenu = new ContextMenu();
-        Image imagePoubelle = new Image(getClass().getResourceAsStream("../assets/icons/trash.png"));
-        Image imageEdit = new Image(getClass().getResourceAsStream("../assets/icons/pencil.png"));
+        Image imagePoubelle = new Image(getClass().getResourceAsStream("/assets/icons/trash.png"));
+        Image imageEdit = new Image(getClass().getResourceAsStream("/assets/icons/pencil.png"));
         MenuItem item1 = new MenuItem("Supprimer", new ImageView(imagePoubelle));
         MenuItem item2 = new MenuItem("Renommer", new ImageView(imageEdit));
 
@@ -98,11 +97,7 @@ public class Sommet extends Parent {
                     } else {
                         Arc arc = new Arc(1, graphe.getPremierSommetRelie(), Sommet.this, graphe);
                         if (graphe.ajouterArc(arc)) {
-                            graphe.getPane().getChildren().add(arc);
-                            graphe.getPremierSommetRelie().toFront(); Sommet.this.toFront();
-                            graphe.getPremierSommetRelie().getCercle().setFill(Color.LIGHTBLUE);
                             getCercle().setFill(Color.LIGHTBLUE);
-                            graphe.setPremierSommetRelie(null);
                         }
                     }
                 }
@@ -117,6 +112,14 @@ public class Sommet extends Parent {
 
     public StackPane getStackPane() {
         return stackPane;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
     }
 
     public int id() {

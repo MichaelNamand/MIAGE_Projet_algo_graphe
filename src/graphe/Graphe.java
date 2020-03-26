@@ -6,6 +6,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import sample.Fenetre;
@@ -37,13 +38,17 @@ public class Graphe extends Parent {
                     Sommet s = new Sommet(idIncrement, t.getSceneX(), t.getSceneY(), "test", Graphe.this);
                     idIncrement++;
                     // Ajout du sommet dans notre liste sommets et dans le pane
-                    sommets.add(s);
-                    pane.getChildren().add(s);
+                    ajouterSommet(s);
                 }
             }
         });
 
         this.getChildren().add(pane);
+    }
+
+    public void ajouterSommet(Sommet s) {
+        sommets.add(s);
+        pane.getChildren().add(s);
     }
 
     public ArrayList<Arc> getArcs() {
@@ -52,21 +57,34 @@ public class Graphe extends Parent {
 
     public boolean ajouterArc(Arc arc) {
         for (Arc a : arcs) {
-            if (a.depart.id == arc.depart.id && a.arrivee.id == arc.arrivee.id) {
+            if (a.getDepart().id == arc.getDepart().id && a.getArrivee().id == arc.getArrivee().id) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Impossible de créer l'arc");
-                alert.setHeaderText("Le sommet " + a.depart.id + " est déjà relié au sommet " + a.arrivee.id + " !");
+                alert.setHeaderText("Le sommet " + a.getDepart().id + " est déjà relié au sommet " + a.getDepart().id + " !");
                 alert.showAndWait();
                 premierSommetRelie = null;
                 return false;
             }
         }
         arcs.add(arc);
+        pane.getChildren().add(arc);
+        arc.getDepart().getCercle().setFill(Color.LIGHTBLUE);
+        premierSommetRelie = null;
+        arc.getDepart().toFront(); arc.getArrivee().toFront();
         return true;
     }
 
     public ArrayList<Sommet> getSommets() {
         return sommets;
+    }
+
+    public Sommet getSommet(int id) {
+        for (Sommet s : sommets) {
+            if (s.id == id) {
+                return s;
+            }
+        }
+        return null;
     }
 
     public Sommet getPremierSommetRelie() {
@@ -79,5 +97,30 @@ public class Graphe extends Parent {
 
     public Pane getPane() {
         return pane;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    @Override
+    public String toString() {
+        String s = "";
+        for (Sommet som : sommets) {
+            s += "{id : " + som.id() + ", Valeur : " + som.getValeur() + ", X : " + som.getX() + ", Y : " + som.getY() + "}\n";
+        }
+        String a = "";
+        for (Arc arc : arcs) {
+            a += "{S1 : " + arc.getDepart().id() + ", S2 : " + arc.getArrivee().id() + ", cout " + arc.getCout() + "}\n";
+        }
+        return "Graphe{" +
+                "sommets=" + s +
+                ", arcs=" + a +
+                ", nom='" + nom + '\'' +
+                '}';
     }
 }

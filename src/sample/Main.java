@@ -8,7 +8,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Graphes");
-        Fenetre fenetre = new Fenetre();
+        Fenetre fenetre = new Fenetre(primaryStage);
         Scene scene = new Scene(fenetre.getBorder(), 1280, 768);
 
         primaryStage.setScene(scene);
