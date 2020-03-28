@@ -12,8 +12,11 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 import sample.ArrowSecond;
+import sample.Fenetre;
 
 import static graphe.Sommet.SOMMET_RADIUS;
 
@@ -23,12 +26,19 @@ public class Arc extends Parent {
     private final Sommet arrivee;
     private ArrowSecond arrow;
     private Line line;
+    private StackPane stackPaneCout;
+    private Graphe graphe;
+
 
     public Arc(int cout, Sommet depart, Sommet arrivee, Graphe graphe) {
         this.cout = cout;
         this.depart = depart;
+        this.graphe = graphe;
         this.arrivee = arrivee;
+        stackPaneCout = new StackPane();
         line = new Line();
+        line.setStrokeWidth(2);
+        line.setStroke(Color.BLACK);
         setLine();
         line.setOnMouseClicked(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent t) {
@@ -61,25 +71,46 @@ public class Arc extends Parent {
 
         double[] points = {0.0, 7.0, -7.0, -7.0, 7.0, -7.0};
         arrow = new ArrowSecond(points, line, SOMMET_RADIUS);
-        this.getChildren().addAll(arrow);
-        this.getChildren().addAll(line);
+        getChildren().addAll(arrow, line, stackPaneCout);
+
+        if (!graphe.isAfficherCoutsArcsEnclenches()) {
+            stackPaneCout.setVisible(false);
+        }
+        Text textCout = new Text(cout + "");
+        Circle circle = new Circle(10, Color.LIGHTGRAY);
+        circle.setStrokeWidth(2);
+        circle.setStroke(Color.BLACK);
+        stackPaneCout.getChildren().addAll(circle, textCout);
+        stackPaneCout.toFront();
+        setLine();
     }
 
     public void setLine() {
-        StackPane sDepart = depart.getStackPane();
-        StackPane sArrivee = arrivee.getStackPane();
 
-        double centerDepartX = (sDepart.getWidth() / 2) + sDepart.getLayoutX();
-        double centerDepartY = (sDepart.getWidth() / 2) + sDepart.getLayoutY();
-        double centerArriveeX = (sArrivee.getWidth() / 2) + sArrivee.getLayoutX();
-        double centerArriveeY = (sArrivee.getWidth() / 2) + sArrivee.getLayoutY();
+        double centerDepartX = (depart.getWidth() / 2) + depart.getLayoutX();
+        double centerDepartY = (depart.getWidth() / 2) + depart.getLayoutY();
+        double centerArriveeX = (arrivee.getWidth() / 2) + arrivee.getLayoutX();
+        double centerArriveeY = (arrivee.getWidth() / 2) + arrivee.getLayoutY();
 
         line.setStartX(centerDepartX);
         line.setStartY(centerDepartY);
         line.setEndX(centerArriveeX);
         line.setEndY(centerArriveeY);
-        line.setStrokeWidth(2);
-        line.setStroke(Color.BLACK);
+
+        if (arrow != null && graphe.isAfficherCoutsArcsEnclenches()) {
+            double angle = Math.toDegrees(Math.atan2(centerArriveeY - centerDepartY, centerArriveeX - centerDepartX));
+            stackPaneCout.setLayoutX((arrow.getTranslateX() + centerDepartX + SOMMET_RADIUS / 2 * Math.cos(Math.toRadians(angle)) - stackPaneCout.getWidth()) / 2);
+            stackPaneCout.setLayoutY((arrow.getTranslateY() + centerDepartY + 10 * Math.sin(Math.toRadians(angle)) - stackPaneCout.getHeight()) / 2);
+        }
+    }
+
+    public void afficherCouts() {
+        stackPaneCout.setVisible(true);
+        setLine();
+    }
+
+    public void masquerCouts() {
+        stackPaneCout.setVisible(false);
     }
 
     public int getCout() {

@@ -9,7 +9,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
-import sample.Fenetre;
 
 import java.util.ArrayList;
 
@@ -19,6 +18,11 @@ public class Graphe extends Parent {
     private String nom;
     private Sommet premierSommetRelie = null;
     public static int idIncrement = 1;
+
+    private boolean creationSommetsEnclenches;
+    private boolean creationArcsEnclenches;
+    private boolean afficherNomsSommetsEnclenches;
+    private boolean afficherCoutsArcsEnclenches;
 
     private Pane pane;
 
@@ -32,7 +36,7 @@ public class Graphe extends Parent {
             public void handle(MouseEvent t) {
                 // Si on clique sur un sommet avec un clic gauche avec le bouton "Créer des sommets" enclenché :
                 if (!(t.getPickResult().getIntersectedNode() instanceof Circle ||
-                        t.getPickResult().getIntersectedNode() instanceof Text) && Fenetre.creerSommetsEnclenche &&
+                        t.getPickResult().getIntersectedNode() instanceof Text) && creationSommetsEnclenches &&
                         t.getButton() == MouseButton.PRIMARY) {
                     // Création du nouveau sommet
                     Sommet s = new Sommet(idIncrement, t.getSceneX(), t.getSceneY(), "test", Graphe.this);
@@ -87,6 +91,15 @@ public class Graphe extends Parent {
         return null;
     }
 
+    public Arc getArcFromSommet(Sommet s) {
+        for (Arc arc : arcs) {
+            if (arc.getDepart().id() == s.id || arc.getArrivee().id() == s.id) {
+                return arc;
+            }
+        }
+        return null;
+    }
+
     public Sommet getPremierSommetRelie() {
         return premierSommetRelie;
     }
@@ -122,5 +135,45 @@ public class Graphe extends Parent {
                 ", arcs=" + a +
                 ", nom='" + nom + '\'' +
                 '}';
+    }
+
+    public void setCreationSommetsEnclenches(boolean creationSommetsEnclenches) {
+        this.creationSommetsEnclenches = creationSommetsEnclenches;
+    }
+
+    public void setCreationArcsEnclenches(boolean creationArcsEnclenches) {
+        this.creationArcsEnclenches = creationArcsEnclenches;
+    }
+
+    public void setAfficherNomsSommetsEnclenches(boolean afficherNomsSommetsEnclenches) {
+        this.afficherNomsSommetsEnclenches = afficherNomsSommetsEnclenches;
+    }
+
+    public void setAfficherCoutsArcsEnclenches(boolean afficherCoutsArcsEnclenches) {
+        this.afficherCoutsArcsEnclenches = afficherCoutsArcsEnclenches;
+        for (Arc a : arcs) {
+            if (afficherCoutsArcsEnclenches) {
+                a.afficherCouts();
+            } else {
+                a.masquerCouts();
+            }
+        }
+
+    }
+
+    public boolean isCreationSommetsEnclenches() {
+        return creationSommetsEnclenches;
+    }
+
+    public boolean isCreationArcsEnclenches() {
+        return creationArcsEnclenches;
+    }
+
+    public boolean isAfficherNomsSommetsEnclenches() {
+        return afficherNomsSommetsEnclenches;
+    }
+
+    public boolean isAfficherCoutsArcsEnclenches() {
+        return afficherCoutsArcsEnclenches;
     }
 }

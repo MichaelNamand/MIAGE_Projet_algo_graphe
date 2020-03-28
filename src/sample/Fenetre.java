@@ -3,7 +3,6 @@ package sample;
 import graphe.Arc;
 import graphe.Graphe;
 import graphe.Sommet;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -11,7 +10,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -27,8 +25,6 @@ public class Fenetre extends Parent {
     private BorderPane border = new BorderPane();
     private ScrollPane scrollPane = new ScrollPane();
     private Stage primaryStage;
-    public static boolean creerSommetsEnclenche;
-    public static boolean creerArcsEnclenche;
 
     public Fenetre(Stage stage) {
         // Images de l'application
@@ -113,11 +109,7 @@ public class Fenetre extends Parent {
                         if (!done) {
                             done = true;
                             setGraphe(graphe, false);
-                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                            alert.setTitle("Patientez...");
-                            alert.setHeaderText("Chargement en cours");
-                            alert.show();
-                            alert.close();
+                            Fenetre.rafraichirInterface();
                         }
                         graphe.ajouterArc(new Arc(Integer.parseInt(elements[3]), graphe.getSommet(Integer.parseInt(elements[1])),
                                 graphe.getSommet(Integer.parseInt(elements[2])), graphe));
@@ -128,10 +120,25 @@ public class Fenetre extends Parent {
                 }
             }
             setGraphe(graphe, true);
+            Fenetre.rafraichirInterface();
+            for (Arc arc : this.graphe.getArcs()) {
+                arc.setLine();
+                arc.getArrow().update();
+            }
+            setGraphe(graphe, true);
 
             Graphe.idIncrement = graphe.getSommets().size() + 1;
         }
     }
+
+    public static void rafraichirInterface() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Patientez...");
+        alert.setHeaderText("Chargement en cours");
+        alert.show();
+        alert.close();
+    }
+
     public void enregistrerModifications() {
         if (graphe != null) {
             if (graphe.getNom().equals("Sans nom")) {
@@ -231,35 +238,34 @@ public class Fenetre extends Parent {
             bSommet.setToggleGroup(group);
             bArc.setToggleGroup(group);
 
-            bSommet.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                public void handle(MouseEvent t) {
-                    if(bSommet.isSelected()) {
-                        graphe.setCursor(Cursor.CROSSHAIR);
-                    } else {
-                        graphe.setCursor(Cursor.DEFAULT);
-                    }
-                    Fenetre.creerSommetsEnclenche = bSommet.isSelected();
-                    if (!bSommet.isSelected() && !bArc.isSelected()) {
-                        Fenetre.creerArcsEnclenche = false;
-                    } else {
-                        Fenetre.creerArcsEnclenche = !bSommet.isSelected();
-                    }
-                }
-            });
-            bArc.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                public void handle(MouseEvent t) {
+            bSommet.setOnMouseClicked(t -> {
+                if(bSommet.isSelected()) {
+                    graphe.setCursor(Cursor.CROSSHAIR);
+                } else {
                     graphe.setCursor(Cursor.DEFAULT);
-                    Fenetre.creerArcsEnclenche = bArc.isSelected();
-                    if (!bArc.isSelected() && !bSommet.isSelected()) {
-                        Fenetre.creerSommetsEnclenche = false;
-                    } else {
-                        Fenetre.creerSommetsEnclenche = !bArc.isSelected();
-                    }
                 }
+                graphe.setCreationArcsEnclenches(bArc.isSelected());
+                graphe.setCreationSommetsEnclenches(bSommet.isSelected());
+            });
+            bArc.setOnMouseClicked(t -> {
+                graphe.setCursor(Cursor.DEFAULT);
+                graphe.setCreationArcsEnclenches(bArc.isSelected());
+                graphe.setCreationSommetsEnclenches(bSommet.isSelected());
             });
 
-            flow.getChildren().add(bSommet);
-            flow.getChildren().add(bArc);
+            VBox vBox = new VBox();
+
+            CheckBox cbArcsCouts = new CheckBox("Afficher le coût des arcs");
+            CheckBox cbNomsSommets = new CheckBox("Afficher le nom des sommets plutôt que leur identifiant");
+
+            cbArcsCouts.setOnAction(t -> {
+                graphe.setAfficherCoutsArcsEnclenches(cbArcsCouts.isSelected());
+            });
+
+            vBox.getChildren().addAll(cbNomsSommets, cbArcsCouts);
+            vBox.setSpacing(5);
+
+            flow.getChildren().addAll(bSommet, bArc, vBox);
             border.setBottom(flow);
         } else {
             if (!debugArc) {
@@ -272,7 +278,6 @@ public class Fenetre extends Parent {
                 ButtonType cancelButton = new ButtonType("Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
                 alert.getButtonTypes().setAll(okButton, noButton, cancelButton);
                 alert.showAndWait().ifPresent(type -> {
-                    System.out.println(type.toString());
                     if (type.getText().equals("Oui")) {
                         enregistrerModifications();
                     } else if (type.getText().equals("Non")) {

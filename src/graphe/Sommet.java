@@ -3,7 +3,6 @@ package graphe;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
-import javafx.scene.Parent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
@@ -17,39 +16,37 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import sample.Fenetre;
 
-public class Sommet extends Parent {
+public class Sommet extends StackPane {
     public final int id;
     public final String valeur;
     static public final double SOMMET_RADIUS = 20;
     double x, y;
     private Circle cercle;
-    private StackPane stackPane;
 
     public Sommet(int id, double x, double y, String valeur, Graphe graphe) {
         this.id = id;
         this.valeur = valeur;
         this.x = x; this.y = y;
-        stackPane = new StackPane();
         cercle = new Circle(20);
         cercle.setStroke(Color.BLACK);
         cercle.setStrokeWidth(2);
         cercle.setFill(Color.LIGHTBLUE);
-        stackPane.getChildren().addAll(cercle, new Text(this.id + ""));
-        stackPane.setLayoutX(x - 23);
-        stackPane.setLayoutY(y - 43);
-        stackPane.setCursor(Cursor.HAND);
-        stackPane.setOnMousePressed((t) -> {
+        getChildren().addAll(cercle, new Text(this.id + ""));
+        setLayoutX(x - 23);
+        setLayoutY(y - 43);
+        setCursor(Cursor.HAND);
+        setOnMousePressed((t) -> {
             this.x = t.getSceneX();
             this.y = t.getSceneY();
         });
 
         // Gestion du déplacement d'un sommet
-        stackPane.setOnMouseDragged((t) -> {
+        setOnMouseDragged((t) -> {
             double offsetX = t.getSceneX() - this.x;
             double offsetY = t.getSceneY() - this.y;
 
-            stackPane.setLayoutX(stackPane.getLayoutX() + offsetX);
-            stackPane.setLayoutY(stackPane.getLayoutY() + offsetY);
+            setLayoutX(getLayoutX() + offsetX);
+            setLayoutY(getLayoutY() + offsetY);
 
             this.x = t.getSceneX();
             this.y = t.getSceneY();
@@ -58,6 +55,7 @@ public class Sommet extends Parent {
                 arc.setLine();
                 arc.getArrow().update();
             }
+            cercle.setFill(Color.LIGHTBLUE);
         });
         // Création du menu contextuel lorsqu'on clique droit sur un sommet
         ContextMenu contextMenu = new ContextMenu();
@@ -85,9 +83,9 @@ public class Sommet extends Parent {
         });
 
         // Gestion du clic d'un sommet
-        stackPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        setOnMouseClicked(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent t) {
-                if(t.getButton() == MouseButton.PRIMARY && Fenetre.creerArcsEnclenche) {
+                if(t.getButton() == MouseButton.PRIMARY && graphe.isCreationArcsEnclenches()) {
                     if (graphe.getPremierSommetRelie() == null) {
                         graphe.setPremierSommetRelie(Sommet.this);
                         getCercle().setFill(Color.LIGHTGREEN);
@@ -98,20 +96,18 @@ public class Sommet extends Parent {
                         Arc arc = new Arc(1, graphe.getPremierSommetRelie(), Sommet.this, graphe);
                         if (graphe.ajouterArc(arc)) {
                             getCercle().setFill(Color.LIGHTBLUE);
+                            if (graphe.isAfficherCoutsArcsEnclenches())
+                                Fenetre.rafraichirInterface();
+                            arc.setLine();
                         }
                     }
                 }
             }
         });
-        this.getChildren().add(stackPane);
     }
 
     public Circle getCercle() {
         return cercle;
-    }
-
-    public StackPane getStackPane() {
-        return stackPane;
     }
 
     public double getX() {
