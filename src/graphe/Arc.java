@@ -3,8 +3,10 @@ package graphe;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ContextMenuEvent;
@@ -16,12 +18,11 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import sample.ArrowSecond;
-import sample.Fenetre;
 
 import static graphe.Sommet.SOMMET_RADIUS;
 
 public class Arc extends Parent {
-    private final int cout;
+    private int cout;
     private final Sommet depart;
     private final Sommet arrivee;
     private ArrowSecond arrow;
@@ -70,7 +71,7 @@ public class Arc extends Parent {
         });
 
         double[] points = {0.0, 7.0, -7.0, -7.0, 7.0, -7.0};
-        arrow = new ArrowSecond(points, line, SOMMET_RADIUS);
+        arrow = new ArrowSecond(points, line);
         getChildren().addAll(arrow, line, stackPaneCout);
 
         if (!graphe.isAfficherCoutsArcsEnclenches()) {
@@ -82,15 +83,37 @@ public class Arc extends Parent {
         circle.setStroke(Color.BLACK);
         stackPaneCout.getChildren().addAll(circle, textCout);
         stackPaneCout.toFront();
+        stackPaneCout.setOnMouseClicked(mouseEvent -> {
+            if(mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount() == 2){
+                TextInputDialog dialog = new TextInputDialog();
+                dialog.setTitle("Renseignement d'information");
+                dialog.setHeaderText("Renseigner le coût de l'arc reliant le sommet " + depart.id() + " au sommet " + arrivee.id());
+                dialog.setContentText("Coût :");
+                dialog.showAndWait().ifPresent(valeur -> {
+                    int c = Integer.MAX_VALUE;
+                    try {
+                        c = Integer.parseInt(valeur);
+                    } catch (NumberFormatException e) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Valeur incorrecte");
+                        alert.setHeaderText("La valeur saisie n'est pas un nombre !");
+                        alert.show();
+                    }
+                    if (c != Integer.MAX_VALUE) {
+                        this.cout = c;
+                        textCout.setText(c + "");
+                    }
+                });
+            }
+        });
         setLine();
     }
 
     public void setLine() {
-
-        double centerDepartX = (depart.getWidth() / 2) + depart.getLayoutX();
-        double centerDepartY = (depart.getWidth() / 2) + depart.getLayoutY();
-        double centerArriveeX = (arrivee.getWidth() / 2) + arrivee.getLayoutX();
-        double centerArriveeY = (arrivee.getWidth() / 2) + arrivee.getLayoutY();
+        double centerDepartX = (depart.getCercle().getLayoutX()) + depart.getLayoutX();
+        double centerDepartY = (depart.getCercle().getLayoutY()) + depart.getLayoutY();
+        double centerArriveeX = (arrivee.getCercle().getLayoutX()) + arrivee.getLayoutX();
+        double centerArriveeY = ( arrivee.getCercle().getLayoutY()) + arrivee.getLayoutY();
 
         line.setStartX(centerDepartX);
         line.setStartY(centerDepartY);

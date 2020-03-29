@@ -1,21 +1,22 @@
 package sample;
 
+import graphe.Sommet;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 
 public class ArrowSecond extends Polygon {
     private Line line;
     double radius;
+    public static int DECALAGE_POINTE = 7;
 
-    public ArrowSecond(double[] points, Line line, double AnchorRadius) {
+    public ArrowSecond(double[] points, Line line) {
         super(points);
         this.line = line;
-        this.radius = AnchorRadius + 7;
         initialize();
-
     }
 
     private void initialize() {
+        radius = Sommet.SOMMET_RADIUS + DECALAGE_POINTE;
         double angle = Math.atan2(line.getEndY() - line.getStartY(), line.getEndX() - line.getStartX()) * 180 / 3.14;
 
         double height = line.getEndY() - line.getStartY();

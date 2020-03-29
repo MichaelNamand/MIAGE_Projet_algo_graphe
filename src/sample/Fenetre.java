@@ -106,26 +106,31 @@ public class Fenetre extends Parent {
                                 Double.parseDouble(elements[3]), elements[4], graphe));
                         break;
                     case "A":
-                        if (!done) {
-                            done = true;
-                            setGraphe(graphe, false);
-                            Fenetre.rafraichirInterface();
-                        }
                         graphe.ajouterArc(new Arc(Integer.parseInt(elements[3]), graphe.getSommet(Integer.parseInt(elements[1])),
                                 graphe.getSommet(Integer.parseInt(elements[2])), graphe));
                         break;
                     case "N":
                         graphe.setNom(elements[1]);
                         primaryStage.setTitle("Graphes - " + elements[1]);
+                        break;
+                    case "O":
+                        graphe.setAfficherCoutsArcsEnclenches(elements[1].equals("true"));
+                        graphe.setAfficherNomsSommetsEnclenches(elements[2].equals("true"));
                 }
             }
-            setGraphe(graphe, true);
+            System.out.println(graphe.isAfficherCoutsArcsEnclenches());
+
+            setGraphe(graphe, false);
             Fenetre.rafraichirInterface();
             for (Arc arc : this.graphe.getArcs()) {
                 arc.setLine();
                 arc.getArrow().update();
             }
-            setGraphe(graphe, true);
+            Fenetre.rafraichirInterface();
+            for (Arc arc : this.graphe.getArcs()) {
+                arc.setLine();
+                arc.getArrow().update();
+            }
 
             Graphe.idIncrement = graphe.getSommets().size() + 1;
         }
@@ -139,14 +144,19 @@ public class Fenetre extends Parent {
         alert.close();
     }
 
+    public static TextInputDialog getTextInputFromDialog(String titre) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Renseignement d'information");
+        dialog.setHeaderText(titre);
+        dialog.setContentText("Nom :");
+        return dialog;
+    }
+
     public void enregistrerModifications() {
         if (graphe != null) {
             if (graphe.getNom().equals("Sans nom")) {
                 // Avant d'enregistrer le graphe, on demande à l'utilisateur son nom
-                TextInputDialog dialog = new TextInputDialog();
-                dialog.setTitle("Nom du graphe");
-                dialog.setHeaderText("Donnez un nom au graphe");
-                dialog.setContentText("Nom :");
+                TextInputDialog dialog = Fenetre.getTextInputFromDialog("Donnez un nom au graphe");
                 dialog.showAndWait().ifPresent(nom -> {
                     graphe.setNom(nom);
                     sauvegardeFichier();
@@ -173,14 +183,12 @@ public class Fenetre extends Parent {
         primaryStage.setTitle("Graphes - " + graphe.getNom());
         BufferedWriter out = null;
         if (file != null) {
-            System.out.println("file");
             try {
                 out = new BufferedWriter(new FileWriter(file));
             } catch (IOException e) {
                 e.printStackTrace();
             }
             if (out != null) {
-                System.out.println("out");
                 // On écrit d'abord le nom du graphe dans le fichier
                 try {
                     out.write("N/" + graphe.getNom());
@@ -191,7 +199,6 @@ public class Fenetre extends Parent {
                 // Puis on écrit les sommets dans le fichier
                 for (Sommet s : graphe.getSommets()) {
                     try {
-                        System.out.println(s.getX() + " " + s.getY());
                         out.write("S/" + s.id() + "/" + s.getX() + "/" + s.getY() + "/" + s.getValeur());
                         out.newLine();
                     } catch (IOException e) {
@@ -207,8 +214,9 @@ public class Fenetre extends Parent {
                         e.printStackTrace();
                     }
                 }
-                //Et on ferme le buffer
+                //On enregistre les options du graphe et on ferme le buffer
                 try {
+                    out.write("O/" + graphe.isAfficherCoutsArcsEnclenches() + "/" + graphe.isAfficherNomsSommetsEnclenches());
                     out.close();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -258,8 +266,14 @@ public class Fenetre extends Parent {
             CheckBox cbArcsCouts = new CheckBox("Afficher le coût des arcs");
             CheckBox cbNomsSommets = new CheckBox("Afficher le nom des sommets plutôt que leur identifiant");
 
+            cbArcsCouts.setSelected(g.isAfficherCoutsArcsEnclenches());
+            cbNomsSommets.setSelected(g.isAfficherNomsSommetsEnclenches());
+
             cbArcsCouts.setOnAction(t -> {
                 graphe.setAfficherCoutsArcsEnclenches(cbArcsCouts.isSelected());
+            });
+            cbNomsSommets.setOnAction(t -> {
+                graphe.setAfficherNomsSommetsEnclenches(cbNomsSommets.isSelected());
             });
 
             vBox.getChildren().addAll(cbNomsSommets, cbArcsCouts);
@@ -269,14 +283,8 @@ public class Fenetre extends Parent {
             border.setBottom(flow);
         } else {
             if (!debugArc) {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Enregistrez vos modifications ?");
-                alert.setHeaderText("Si vous créer un nouveau graphe, celui actuel risque de perdre des informations non enregistrées");
-                alert.setContentText("Souhaitez-vous enregistrer vos modifications ?");
-                ButtonType okButton = new ButtonType("Oui", ButtonBar.ButtonData.YES);
-                ButtonType noButton = new ButtonType("Non", ButtonBar.ButtonData.NO);
-                ButtonType cancelButton = new ButtonType("Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
-                alert.getButtonTypes().setAll(okButton, noButton, cancelButton);
+                Alert alert = getConfirmationQuitter(g, "Si vous créer un nouveau graphe, celui actuel risque " +
+                        "de perdre des informations non enregistrées");
                 alert.showAndWait().ifPresent(type -> {
                     if (type.getText().equals("Oui")) {
                         enregistrerModifications();
@@ -289,6 +297,22 @@ public class Fenetre extends Parent {
                 });
             }
         }
+    }
+
+    public Alert getConfirmationQuitter(Graphe g, String message) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Information");
+        alert.setHeaderText(message);
+        alert.setContentText("Souhaitez-vous enregistrer vos modifications ?");
+        ButtonType okButton = new ButtonType("Oui", ButtonBar.ButtonData.YES);
+        ButtonType noButton = new ButtonType("Non", ButtonBar.ButtonData.NO);
+        ButtonType cancelButton = new ButtonType("Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(okButton, noButton, cancelButton);
+        return alert;
+    }
+
+    public Graphe getGraphe() {
+        return graphe;
     }
 
     public BorderPane getBorder() {

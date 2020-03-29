@@ -3,12 +3,14 @@ package graphe;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
+import sample.Fenetre;
 
 import java.util.ArrayList;
 
@@ -39,10 +41,17 @@ public class Graphe extends Parent {
                         t.getPickResult().getIntersectedNode() instanceof Text) && creationSommetsEnclenches &&
                         t.getButton() == MouseButton.PRIMARY) {
                     // Création du nouveau sommet
-                    Sommet s = new Sommet(idIncrement, t.getSceneX(), t.getSceneY(), "test", Graphe.this);
+                    if (isAfficherNomsSommetsEnclenches()) {
+                        TextInputDialog dialog = Fenetre.getTextInputFromDialog("Renseignez le nom du sommet :");
+                        dialog.showAndWait().ifPresent(nomSommet -> {
+                            // Ajout du sommet dans notre liste sommets et dans le pane
+                            ajouterSommet(new Sommet(idIncrement, t.getSceneX(), t.getSceneY(), nomSommet, Graphe.this));
+                        });
+                    } else {
+                        // Ajout du sommet dans notre liste sommets et dans le pane
+                        ajouterSommet(new Sommet(idIncrement, t.getSceneX(), t.getSceneY(), "Sans nom", Graphe.this));
+                    }
                     idIncrement++;
-                    // Ajout du sommet dans notre liste sommets et dans le pane
-                    ajouterSommet(s);
                 }
             }
         });
@@ -147,6 +156,14 @@ public class Graphe extends Parent {
 
     public void setAfficherNomsSommetsEnclenches(boolean afficherNomsSommetsEnclenches) {
         this.afficherNomsSommetsEnclenches = afficherNomsSommetsEnclenches;
+        for (Sommet s : sommets) {
+            s.setStyleSommet(afficherNomsSommetsEnclenches);
+        }
+        Fenetre.rafraichirInterface();
+        for (Arc a : arcs) {
+            a.setLine();
+            a.getArrow().update();
+        }
     }
 
     public void setAfficherCoutsArcsEnclenches(boolean afficherCoutsArcsEnclenches) {
