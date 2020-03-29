@@ -3,6 +3,7 @@ package sample;
 import graphe.Arc;
 import graphe.Graphe;
 import graphe.Sommet;
+import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -16,6 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.*;
 import java.util.Scanner;
@@ -124,11 +126,6 @@ public class Fenetre extends Parent {
                 arc.setLine();
                 arc.getArrow().update();
             }
-            Fenetre.rafraichirInterface();
-            for (Arc arc : this.graphe.getArcs()) {
-                arc.setLine();
-                arc.getArrow().update();
-            }
 
             Graphe.idIncrement = graphe.getSommets().size() + 1;
         }
@@ -138,8 +135,12 @@ public class Fenetre extends Parent {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Patientez...");
         alert.setHeaderText("Chargement en cours");
-        alert.show();
-        alert.close();
+        PauseTransition pauseTransition = new PauseTransition(Duration.millis(100));
+        pauseTransition.setOnFinished(t -> {
+            alert.close();
+        });
+        pauseTransition.play();
+        alert.showAndWait();
     }
 
     public static TextInputDialog getTextInputFromDialog(String titre) {
