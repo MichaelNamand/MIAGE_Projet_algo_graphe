@@ -33,19 +33,21 @@ public class Main extends Application {
         primaryStage.show();
 
         primaryStage.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, t -> {
-            Alert alert = fenetre.getConfirmationQuitter(new Graphe(""), "Voulez-vous enregistrer vos éventuelles" +
-                    " modifications avant de quitter ?");
-            alert.showAndWait().ifPresent(type -> {
-                if (type.getText().equals("Oui")) {
-                    Main.this.fenetre.enregistrerModifications();
-                    primaryStage.close();
-                } else if (type.getText().equals("Non")) {
-                    primaryStage.close();
-                } else {
-                    alert.close();
-                    t.consume();
-                }
-            });
+            if (fenetre.getGraphe() != null) {
+                Alert alert = fenetre.getConfirmationQuitter(new Graphe(""), "Voulez-vous enregistrer vos éventuelles" +
+                        " modifications avant de quitter ?");
+                alert.showAndWait().ifPresent(type -> {
+                    if (type.getText().equals("Oui")) {
+                        Main.this.fenetre.enregistrerModifications();
+                        primaryStage.close();
+                    } else if (type.getText().equals("Non")) {
+                        primaryStage.close();
+                    } else {
+                        alert.close();
+                        t.consume();
+                    }
+                });
+            }
         });
     }
 

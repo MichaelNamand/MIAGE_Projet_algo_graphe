@@ -164,6 +164,7 @@ public class Graphe extends Parent {
             a.setLine();
             a.getArrow().update();
         }
+        setAfficherCoutsArcsEnclenches(isAfficherCoutsArcsEnclenches());
     }
 
     public void setAfficherCoutsArcsEnclenches(boolean afficherCoutsArcsEnclenches) {
@@ -175,7 +176,7 @@ public class Graphe extends Parent {
                 a.masquerCouts();
             }
         }
-
+        Fenetre.rafraichirInterface();
     }
 
     public boolean isCreationSommetsEnclenches() {

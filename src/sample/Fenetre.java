@@ -118,8 +118,6 @@ public class Fenetre extends Parent {
                         graphe.setAfficherNomsSommetsEnclenches(elements[2].equals("true"));
                 }
             }
-            System.out.println(graphe.isAfficherCoutsArcsEnclenches());
-
             setGraphe(graphe, false);
             Fenetre.rafraichirInterface();
             for (Arc arc : this.graphe.getArcs()) {
@@ -226,6 +224,7 @@ public class Fenetre extends Parent {
     }
 
     public void setGraphe(Graphe g, boolean debugArc) {
+        Graphe.idIncrement = 1;
         if (graphe == null) {
             graphe = g;
 

@@ -115,12 +115,14 @@ public class Arc extends Parent {
         double centerArriveeX = (arrivee.getCercle().getLayoutX()) + arrivee.getLayoutX();
         double centerArriveeY = ( arrivee.getCercle().getLayoutY()) + arrivee.getLayoutY();
 
+        // Mise à jour de la position de la ligne composant la flèche
         line.setStartX(centerDepartX);
         line.setStartY(centerDepartY);
         line.setEndX(centerArriveeX);
         line.setEndY(centerArriveeY);
 
-        if (arrow != null && graphe.isAfficherCoutsArcsEnclenches()) {
+        // Mise à jour de la position de l'affichage du coût de l'arc
+        if (arrow != null) {
             double angle = Math.toDegrees(Math.atan2(centerArriveeY - centerDepartY, centerArriveeX - centerDepartX));
             stackPaneCout.setLayoutX((arrow.getTranslateX() + centerDepartX + SOMMET_RADIUS / 2 * Math.cos(Math.toRadians(angle)) - stackPaneCout.getWidth()) / 2);
             stackPaneCout.setLayoutY((arrow.getTranslateY() + centerDepartY + 10 * Math.sin(Math.toRadians(angle)) - stackPaneCout.getHeight()) / 2);
