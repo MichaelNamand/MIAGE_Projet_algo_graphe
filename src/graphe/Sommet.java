@@ -14,28 +14,54 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import sample.Fenetre;
 
+import java.util.Objects;
+
 public class Sommet extends StackPane {
-    public final int id;
-    public String valeur;
+    private int id;
+    private String valeur;
+    private int rang;
+
     static public double SOMMET_RADIUS = 20;
     double x, y;
     private Circle cercle;
     private Text nomAffichage;
+    private StackPane rangAffichage;
 
-    public Sommet(int id, double x, double y, String valeur, Graphe graphe) {
+    public Sommet(Sommet s, Graphe g) {
+        this(s.id(), s.getX(), s.getY(), s.getRang(), s.getValeur(), g);
+    }
+
+    public Sommet(int id, double x, double y, int rang, String valeur, Graphe graphe) {
         this.id = id;
         this.valeur = valeur;
+        this.rang = rang;
+
+        // Coordonnées du sommet dans le graphe
         this.x = x; this.y = y;
+        // Texte affiché sur le sommet (id ou valeur)
         nomAffichage = new Text(graphe.isAfficherNomsSommetsEnclenches() ? valeur : id + "");
+        rangAffichage = new StackPane();
+        Text textRang = new Text(rang == -1 ? "+∞" : rang + "");
+        Rectangle rectangleRang = new Rectangle(18, 18, Color.LIGHTGRAY);
+        rectangleRang.setStrokeWidth(1);
+        rectangleRang.setStroke(Color.BLACK);
+        rangAffichage.getChildren().addAll(rectangleRang, textRang);
+
+        // Création du contenu graphique (cercle et positionnement)
         cercle = new Circle();
-        setStyleSommet(graphe.isAfficherNomsSommetsEnclenches());
         cercle.setStroke(Color.BLACK);
         cercle.setStrokeWidth(2);
         cercle.setFill(Color.LIGHTBLUE);
-        getChildren().addAll(cercle, nomAffichage);
+
+        // Ajout du contenu graphique dans le StackPane (layout)
+        getChildren().addAll(cercle, nomAffichage, rangAffichage);
+        setStyleSommet(graphe.isAfficherNomsSommetsEnclenches());
+        rangAffichage.setVisible(graphe.isAfficherRangSommetsEnclenches());
+
         setLayoutX(x - getSommetRadius());
         setLayoutY(y - getSommetRadius() * 2);
         setCursor(Cursor.HAND);
@@ -60,6 +86,7 @@ public class Sommet extends StackPane {
                 arc.getArrow().update();
             }
             cercle.setFill(Color.LIGHTBLUE);
+            Fenetre.changementsEffectues = true;
         });
         // Création du menu contextuel lorsqu'on clique droit sur un sommet
         ContextMenu contextMenu = new ContextMenu();
@@ -70,12 +97,20 @@ public class Sommet extends StackPane {
 
         // Gestion du clic Supprimer
         item1.setOnAction(event -> {
+            Graphe.idIncrement--;
+            for (Sommet s : graphe.getSommets()) {
+                if (s.id() > Sommet.this.id) {
+                    s.decrementeId();
+                    s.setStyleSommet(graphe.isAfficherNomsSommetsEnclenches());
+                }
+            }
             graphe.getSommets().remove(Sommet.this);
             while (graphe.getArcFromSommet(Sommet.this) != null) {
                 Arc a = graphe.getArcFromSommet(Sommet.this);
                 graphe.getPane().getChildren().remove(a);
                 graphe.getArcs().remove(a);
             }
+            Fenetre.changementsEffectues = true;
             graphe.getPane().getChildren().remove(Sommet.this);
         });
         // Gestion du clic Renommer
@@ -114,6 +149,7 @@ public class Sommet extends StackPane {
                             if (graphe.isAfficherCoutsArcsEnclenches())
                                 Fenetre.rafraichirInterface();
                             arc.setLine();
+                            Fenetre.changementsEffectues = true;
                         }
                     }
                 }
@@ -121,13 +157,33 @@ public class Sommet extends StackPane {
         });
     }
 
+    public StackPane getRangAffichage() {
+        return rangAffichage;
+    }
+
+    public int getRang() {
+        return rang;
+    }
+
+    public void decrementeId() {
+        id--;
+    }
+
+    public void setRang(int rang) {
+        this.rang = rang;
+        Text text = (Text) rangAffichage.getChildren().get(1);
+        if (rang == -1) {
+            text.setText("+∞");
+        } else {
+            text.setText(rang + "");
+        }
+    }
+
     public void setNomAffichageSommet(String nom) { nomAffichage.setText(nom); }
 
     public double getSommetRadius() { return cercle.getRadius() + cercle.getStrokeWidth() * 2; }
 
     public Circle getCercle() { return cercle; }
-
-    public Text getNomAffichage() { return nomAffichage; }
 
     public double getX() { return x; }
 
@@ -143,13 +199,36 @@ public class Sommet extends StackPane {
         if (parValeur) {
             Sommet.SOMMET_RADIUS = 5;
             setNomAffichageSommet(getValeur());
-            StackPane.setAlignment(getNomAffichage(), Pos.BOTTOM_CENTER);
+            StackPane.setAlignment(nomAffichage, Pos.BOTTOM_CENTER);
             cercle.setRadius(Sommet.SOMMET_RADIUS);
         } else {
             Sommet.SOMMET_RADIUS = 20;
             setNomAffichageSommet(id() + "");
-            StackPane.setAlignment(getNomAffichage(), Pos.CENTER);
+            StackPane.setAlignment(nomAffichage, Pos.CENTER);
             cercle.setRadius(Sommet.SOMMET_RADIUS);
         }
+        rangAffichage.setTranslateX(rangAffichage.getLayoutX() + getSommetRadius());
+        rangAffichage.setTranslateY(rangAffichage.getLayoutY() - getSommetRadius());
+    }
+
+    @Override
+    public String toString() {
+        return "Sommet{" +
+                "id=" + id +
+                ", valeur='" + valeur + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Sommet sommet = (Sommet) o;
+        return id == sommet.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

@@ -33,7 +33,7 @@ public class Main extends Application {
         primaryStage.show();
 
         primaryStage.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, t -> {
-            if (fenetre.getGraphe() != null) {
+            if (fenetre.getGraphe() != null && Fenetre.changementsEffectues) {
                 Alert alert = fenetre.getConfirmationQuitter(new Graphe(""), "Voulez-vous enregistrer vos éventuelles" +
                         " modifications avant de quitter ?");
                 alert.showAndWait().ifPresent(type -> {

@@ -1,11 +1,12 @@
 package sample;
 
+import algorithmes.Ordonnancement;
+import algorithmes.Rang;
 import graphe.Arc;
 import graphe.Graphe;
 import graphe.Sommet;
 import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -14,7 +15,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -27,7 +27,11 @@ public class Fenetre extends Parent {
     private BorderPane border = new BorderPane();
     private ScrollPane scrollPane = new ScrollPane();
     private Stage primaryStage;
+    public static boolean changementsEffectues = false;
 
+    private CheckBox cbRangsSommets;
+    private CheckBox cbArcsCouts;
+    private CheckBox cbNomsSommets;
     public Fenetre(Stage stage) {
         // Images de l'application
         Image imageAjouter = new Image(getClass().getResourceAsStream("/assets/icons/plus.png"));
@@ -39,6 +43,7 @@ public class Fenetre extends Parent {
         // Création de la barre de menu
         MenuBar menuBar = new MenuBar();
         Menu menu = new Menu("Menu");
+        Menu menuAlgorithmes = new Menu("Algorithmes");
 
         // Création des éléments du menu
         MenuItem menuCreer = new MenuItem("Créer un nouveau graphe", new ImageView(imageAjouter));
@@ -50,30 +55,40 @@ public class Fenetre extends Parent {
         MenuItem menuEnregistrer = new MenuItem("Enregistrer...", new ImageView(imageEnregistrer));
         menuEnregistrer.setOnAction(t -> { enregistrerModifications(); });
 
+        Menu menuRang = new Menu("Algorithme du rang");
+        Menu menuOrdonnancement = new Menu("Problème d'ordonnancement");
+
+        MenuItem menuOrdonnancementLancer = new MenuItem("Lancer");
+        MenuItem menuOrdonnancementRetablir = new MenuItem("Rétablir");
+        menuOrdonnancementLancer.setOnAction(t -> { Ordonnancement.setOrdonnancement(graphe); });
+        menuOrdonnancementRetablir.setOnAction(t -> {
+            for (Arc arc : graphe.getArcs()) {
+                arc.resetArcDisplay();
+            }
+        });
+        MenuItem menuRangLancer = new MenuItem("Lancer");
+        menuRangLancer.setOnAction(t -> {
+            Rang.setRang(graphe);
+            graphe.setAfficherRangSommetsEnclenches(true);
+            if (cbRangsSommets != null) {
+                cbRangsSommets.setSelected(true);
+            }
+        });
+        menuRang.getItems().add(menuRangLancer);
+        menuOrdonnancement.getItems().addAll(menuOrdonnancementLancer, menuOrdonnancementRetablir);
+
+        menuAlgorithmes.getItems().addAll(menuRang, menuOrdonnancement);
+
         // Ajout des éléments au menu
         menu.getItems().addAll(menuCreer, menuOuvrir, menuEnregistrer);
         menu.getItems().add(new MenuItem("Quitter", new ImageView(imageQuitter)));
-        menuBar.getMenus().add(menu);
+        menuBar.getMenus().addAll(menu, menuAlgorithmes);
 
         // Ajout du menu au layout racine
         border.setTop(menuBar);
 
-        // Création du layout "Aucun graphe"
-        VBox vbox = new VBox();
-        Text text = new Text("Aucun graphe n'est actuellement ouvert");
-        Button bCreer = new Button("Créer un nouveau graphe", new ImageView(imageAjouter));
-        Button bOuvrir = new Button("Ouvrir un graphe...", new ImageView(imageEnregistrer));
-        bCreer.setOnMouseClicked(t -> setGraphe(new Graphe("Sans nom"), false));
-        bOuvrir.setOnMouseClicked(t -> ouvrirGraphe());
-
-        // Ajout du layout "Aucun graphe" au layout vbox
-        vbox.getChildren().addAll(text, bCreer, bOuvrir);
-        vbox.setSpacing(10);
-
-        vbox.setAlignment(Pos.CENTER);
-
         // Ajout du layout vbox au layout racine
-        border.setCenter(vbox);
+        setGraphe(new Graphe("Sans nom"), false);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setFitToHeight(true);
@@ -105,7 +120,7 @@ public class Fenetre extends Parent {
                 switch (elements[0]) {
                     case "S":
                         graphe.ajouterSommet(new Sommet(Integer.parseInt(elements[1]), Double.parseDouble(elements[2]),
-                                Double.parseDouble(elements[3]), elements[4], graphe));
+                                Double.parseDouble(elements[3]), Integer.parseInt(elements[4]), elements[5],  graphe));
                         break;
                     case "A":
                         graphe.ajouterArc(new Arc(Integer.parseInt(elements[3]), graphe.getSommet(Integer.parseInt(elements[1])),
@@ -116,17 +131,15 @@ public class Fenetre extends Parent {
                         primaryStage.setTitle("Graphes - " + elements[1]);
                         break;
                     case "O":
+                        setGraphe(graphe, false);
                         graphe.setAfficherCoutsArcsEnclenches(elements[1].equals("true"));
                         graphe.setAfficherNomsSommetsEnclenches(elements[2].equals("true"));
+                        graphe.setAfficherRangSommetsEnclenches(elements[3].equals("true"));
+                        cbRangsSommets.setSelected(graphe.isAfficherRangSommetsEnclenches());
+                        cbArcsCouts.setSelected(graphe.isAfficherCoutsArcsEnclenches());
+                        cbNomsSommets.setSelected(graphe.isAfficherNomsSommetsEnclenches());
                 }
             }
-            setGraphe(graphe, false);
-            Fenetre.rafraichirInterface();
-            for (Arc arc : this.graphe.getArcs()) {
-                arc.setLine();
-                arc.getArrow().update();
-            }
-
             Graphe.idIncrement = graphe.getSommets().size() + 1;
         }
     }
@@ -134,8 +147,8 @@ public class Fenetre extends Parent {
     public static void rafraichirInterface() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Patientez...");
-        alert.setHeaderText("Chargement en cours");
-        PauseTransition pauseTransition = new PauseTransition(Duration.millis(100));
+        alert.setHeaderText("Mise à jour de l'interface...");
+        PauseTransition pauseTransition = new PauseTransition(Duration.millis(200));
         pauseTransition.setOnFinished(t -> {
             alert.close();
         });
@@ -198,7 +211,7 @@ public class Fenetre extends Parent {
                 // Puis on écrit les sommets dans le fichier
                 for (Sommet s : graphe.getSommets()) {
                     try {
-                        out.write("S/" + s.id() + "/" + s.getX() + "/" + s.getY() + "/" + s.getValeur());
+                        out.write("S/" + s.id() + "/" + s.getX() + "/" + s.getY() + "/" + s.getRang() + "/" + s.getValeur());
                         out.newLine();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -215,7 +228,8 @@ public class Fenetre extends Parent {
                 }
                 //On enregistre les options du graphe et on ferme le buffer
                 try {
-                    out.write("O/" + graphe.isAfficherCoutsArcsEnclenches() + "/" + graphe.isAfficherNomsSommetsEnclenches());
+                    out.write("O/" + graphe.isAfficherCoutsArcsEnclenches() + "/" + graphe.isAfficherNomsSommetsEnclenches() +
+                            "/" + graphe.isAfficherRangSommetsEnclenches());
                     out.close();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -225,78 +239,81 @@ public class Fenetre extends Parent {
     }
 
     public void setGraphe(Graphe g, boolean debugArc) {
-        Graphe.idIncrement = 1;
-        if (graphe == null) {
-            graphe = g;
-
-            scrollPane.setContent(graphe);
-            scrollPane.setStyle("-fx-background-color: lightgray, white ;" +
-                    "    -fx-background-insets: 0, 5 ;");
-            border.setCenter(scrollPane);
-            HBox flow = new HBox();
-            flow.setPadding(new Insets(10, 0, 10, 10));
-            flow.setSpacing(10); // preferred width allows for two columns
-            flow.setStyle("-fx-background-color: DAE6F3;");
-            Image imageSommet = new Image(getClass().getResourceAsStream("/assets/icons/pin.png"));
-            Image imageArc = new Image(getClass().getResourceAsStream("/assets/icons/link.png"));
-
-            ToggleGroup group = new ToggleGroup();
-            ToggleButton bSommet = new ToggleButton("Créer des sommets", new ImageView(imageSommet));
-            ToggleButton bArc = new ToggleButton("Créer des arcs", new ImageView(imageArc));
-            bSommet.setToggleGroup(group);
-            bArc.setToggleGroup(group);
-
-            bSommet.setOnMouseClicked(t -> {
-                if(bSommet.isSelected()) {
-                    graphe.setCursor(Cursor.CROSSHAIR);
+        if (!debugArc && Fenetre.changementsEffectues) {
+            Alert alert = getConfirmationQuitter(g, "Si vous créer un nouveau graphe, celui actuel risque " +
+                    "de perdre des informations non enregistrées");
+            alert.showAndWait().ifPresent(type -> {
+                if (type.getText().equals("Oui")) {
+                    enregistrerModifications();
+                } else if (type.getText().equals("Non")) {
+                    Fenetre.changementsEffectues = false;
+                    setGraphe(g, false);
                 } else {
-                    graphe.setCursor(Cursor.DEFAULT);
+                    alert.close();
                 }
-                graphe.setCreationArcsEnclenches(bArc.isSelected());
-                graphe.setCreationSommetsEnclenches(bSommet.isSelected());
             });
-            bArc.setOnMouseClicked(t -> {
-                graphe.setCursor(Cursor.DEFAULT);
-                graphe.setCreationArcsEnclenches(bArc.isSelected());
-                graphe.setCreationSommetsEnclenches(bSommet.isSelected());
-            });
-
-            VBox vBox = new VBox();
-
-            CheckBox cbArcsCouts = new CheckBox("Afficher le coût des arcs");
-            CheckBox cbNomsSommets = new CheckBox("Afficher le nom des sommets plutôt que leur identifiant");
-
-            cbArcsCouts.setSelected(g.isAfficherCoutsArcsEnclenches());
-            cbNomsSommets.setSelected(g.isAfficherNomsSommetsEnclenches());
-
-            cbArcsCouts.setOnAction(t -> {
-                graphe.setAfficherCoutsArcsEnclenches(cbArcsCouts.isSelected());
-            });
-            cbNomsSommets.setOnAction(t -> {
-                graphe.setAfficherNomsSommetsEnclenches(cbNomsSommets.isSelected());
-            });
-
-            vBox.getChildren().addAll(cbNomsSommets, cbArcsCouts);
-            vBox.setSpacing(5);
-
-            flow.getChildren().addAll(bSommet, bArc, vBox);
-            border.setBottom(flow);
-        } else {
-            if (!debugArc) {
-                Alert alert = getConfirmationQuitter(g, "Si vous créer un nouveau graphe, celui actuel risque " +
-                        "de perdre des informations non enregistrées");
-                alert.showAndWait().ifPresent(type -> {
-                    if (type.getText().equals("Oui")) {
-                        enregistrerModifications();
-                    } else if (type.getText().equals("Non")) {
-                        graphe = null;
-                        setGraphe(g, false);
-                    } else {
-                        alert.close();
-                    }
-                });
-            }
+            return;
         }
+        graphe = null;
+        Graphe.idIncrement = 1;
+        graphe = g;
+
+        scrollPane.setContent(graphe);
+        scrollPane.setStyle("-fx-background-color: lightgray, white ;" +
+                "    -fx-background-insets: 0, 5 ;");
+        border.setCenter(scrollPane);
+        HBox flow = new HBox();
+        flow.setPadding(new Insets(10, 0, 10, 10));
+        flow.setSpacing(10); // preferred width allows for two columns
+        flow.setStyle("-fx-background-color: DAE6F3;");
+        Image imageSommet = new Image(getClass().getResourceAsStream("/assets/icons/pin.png"));
+        Image imageArc = new Image(getClass().getResourceAsStream("/assets/icons/link.png"));
+
+        ToggleGroup group = new ToggleGroup();
+        ToggleButton bSommet = new ToggleButton("Créer des sommets", new ImageView(imageSommet));
+        ToggleButton bArc = new ToggleButton("Créer des arcs", new ImageView(imageArc));
+        bSommet.setToggleGroup(group);
+        bArc.setToggleGroup(group);
+
+        bSommet.setOnMouseClicked(t -> {
+            if(bSommet.isSelected()) {
+                graphe.setCursor(Cursor.CROSSHAIR);
+            } else {
+                graphe.setCursor(Cursor.DEFAULT);
+            }
+            graphe.setCreationArcsEnclenches(bArc.isSelected());
+            graphe.setCreationSommetsEnclenches(bSommet.isSelected());
+        });
+        bArc.setOnMouseClicked(t -> {
+            graphe.setCursor(Cursor.DEFAULT);
+            graphe.setCreationArcsEnclenches(bArc.isSelected());
+            graphe.setCreationSommetsEnclenches(bSommet.isSelected());
+        });
+
+        VBox vBox = new VBox();
+
+        cbArcsCouts = new CheckBox("Afficher le coût des arcs");
+        cbNomsSommets = new CheckBox("Afficher le nom des sommets plutôt que leur identifiant");
+        cbRangsSommets = new CheckBox("Afficher le rang des sommets");
+
+        cbArcsCouts.setSelected(g.isAfficherCoutsArcsEnclenches());
+        cbNomsSommets.setSelected(g.isAfficherNomsSommetsEnclenches());
+
+        cbArcsCouts.setOnAction(t -> {
+            graphe.setAfficherCoutsArcsEnclenches(cbArcsCouts.isSelected());
+        });
+        cbNomsSommets.setOnAction(t -> {
+            graphe.setAfficherNomsSommetsEnclenches(cbNomsSommets.isSelected());
+        });
+        cbRangsSommets.setOnAction(t -> {
+            graphe.setAfficherRangSommetsEnclenches(cbRangsSommets.isSelected());
+        });
+
+        vBox.getChildren().addAll(cbNomsSommets, cbArcsCouts);
+        vBox.setSpacing(5);
+
+        flow.getChildren().addAll(bSommet, bArc, vBox, cbRangsSommets);
+        border.setBottom(flow);
     }
 
     public Alert getConfirmationQuitter(Graphe g, String message) {

@@ -18,22 +18,29 @@ public class Graphe extends Parent {
     private ArrayList<Sommet> sommets = new ArrayList<>();
     private ArrayList<Arc> arcs = new ArrayList<>();
     private String nom;
-    private Sommet premierSommetRelie = null;
-    public static int idIncrement = 1;
 
-    private boolean creationSommetsEnclenches;
-    private boolean creationArcsEnclenches;
-    private boolean afficherNomsSommetsEnclenches;
-    private boolean afficherCoutsArcsEnclenches;
+    // Elements graphiques
+    private Sommet premierSommetRelie = null;       // Sommet tampon pour la création d'arc
+    public static int idIncrement = 1;              // Id static représentant aussi le nombre de sommets du graphe
 
-    private Pane pane;
+    private boolean creationSommetsEnclenches;      // Statut du bouton "Créer des sommets"
+    private boolean creationArcsEnclenches;         // Statut du bouton "Créer des arcs"
+    private boolean afficherNomsSommetsEnclenches;  // Statut de la checkbox "Afficher le nom des sommets"
+    private boolean afficherRangSommetsEnclenches;  // Statut de la checkbox "Afficher le rang des sommets"
+    private boolean afficherCoutsArcsEnclenches;    // Statut de la checkbox "Afficher le coût des arcs"
+
+    private Pane pane;                              // Pane contenant les sommets et les arcs  du graphe
 
     public Graphe(String nom) {
         this.nom = nom;
+
+        // Définitions des éléments graphiques
         pane = new Pane();
         pane.setStyle("-fx-background-color:lightgray");
         pane.setPrefWidth(1277);
         pane.setPrefHeight(670);
+
+        // Ajout d'un click listener au pane
         pane.setOnMouseClicked(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent t) {
                 // Si on clique sur un sommet avec un clic gauche avec le bouton "Créer des sommets" enclenché :
@@ -45,17 +52,19 @@ public class Graphe extends Parent {
                         TextInputDialog dialog = Fenetre.getTextInputFromDialog("Renseignez le nom du sommet :");
                         dialog.showAndWait().ifPresent(nomSommet -> {
                             // Ajout du sommet dans notre liste sommets et dans le pane
-                            ajouterSommet(new Sommet(idIncrement, t.getSceneX(), t.getSceneY(), nomSommet, Graphe.this));
+                            ajouterSommet(new Sommet(idIncrement, t.getSceneX(), t.getSceneY(), -1, nomSommet, Graphe.this));
                         });
                     } else {
                         // Ajout du sommet dans notre liste sommets et dans le pane
-                        ajouterSommet(new Sommet(idIncrement, t.getSceneX(), t.getSceneY(), "Sans nom", Graphe.this));
+                        ajouterSommet(new Sommet(idIncrement, t.getSceneX(), t.getSceneY(), -1, "Sans nom", Graphe.this));
                     }
+                    Fenetre.changementsEffectues = true;
                     idIncrement++;
                 }
             }
         });
 
+        // Ajout du pane à la fenêtre
         this.getChildren().add(pane);
     }
 
@@ -70,10 +79,10 @@ public class Graphe extends Parent {
 
     public boolean ajouterArc(Arc arc) {
         for (Arc a : arcs) {
-            if (a.getDepart().id == arc.getDepart().id && a.getArrivee().id == arc.getArrivee().id) {
+            if (a.getDepart().id() == arc.getDepart().id() && a.getArrivee().id() == arc.getArrivee().id()) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Impossible de créer l'arc");
-                alert.setHeaderText("Le sommet " + a.getDepart().id + " est déjà relié au sommet " + a.getDepart().id + " !");
+                alert.setHeaderText("Le sommet " + a.getDepart().id() + " est déjà relié au sommet " + a.getDepart().id() + " !");
                 alert.showAndWait();
                 premierSommetRelie = null;
                 return false;
@@ -93,7 +102,7 @@ public class Graphe extends Parent {
 
     public Sommet getSommet(int id) {
         for (Sommet s : sommets) {
-            if (s.id == id) {
+            if (s.id() == id) {
                 return s;
             }
         }
@@ -102,7 +111,15 @@ public class Graphe extends Parent {
 
     public Arc getArcFromSommet(Sommet s) {
         for (Arc arc : arcs) {
-            if (arc.getDepart().id() == s.id || arc.getArrivee().id() == s.id) {
+            if (arc.getDepart().id() == s.id() || arc.getArrivee().id() == s.id()) {
+                return arc;
+            }
+        }
+        return null;
+    }
+    public Arc getArcFromSommets(Sommet depart, Sommet arrive) {
+        for (Arc arc : arcs) {
+            if (arc.getDepart().equals(depart) && arc.getArrivee().equals(arrive)) {
                 return arc;
             }
         }
@@ -111,6 +128,26 @@ public class Graphe extends Parent {
 
     public Sommet getPremierSommetRelie() {
         return premierSommetRelie;
+    }
+
+    public ArrayList<Sommet> getSuccesseursSommet(Sommet s) {
+        ArrayList<Sommet> successeurs = new ArrayList<>();
+        for (Arc arc : arcs) {
+            if (arc.getDepart().id() == s.id()) {
+                successeurs.add(arc.getArrivee());
+            }
+        }
+        return successeurs;
+    }
+
+    public ArrayList<Sommet> getPredecesseursSommet(Sommet s) {
+        ArrayList<Sommet> predecesseurs = new ArrayList<>();
+        for (Arc arc : arcs) {
+            if (arc.getArrivee().id() == s.id()) {
+                predecesseurs.add(arc.getDepart());
+            }
+        }
+        return predecesseurs;
     }
 
     public void setPremierSommetRelie(Sommet premierSommetRelie) {
@@ -166,6 +203,12 @@ public class Graphe extends Parent {
         }
         setAfficherCoutsArcsEnclenches(isAfficherCoutsArcsEnclenches());
     }
+    public void setAfficherRangSommetsEnclenches(boolean afficherRangSommetsEnclenches) {
+        this.afficherRangSommetsEnclenches = afficherRangSommetsEnclenches;
+        for (Sommet s : getSommets()) {
+            s.getRangAffichage().setVisible(afficherRangSommetsEnclenches);
+        }
+    }
 
     public void setAfficherCoutsArcsEnclenches(boolean afficherCoutsArcsEnclenches) {
         this.afficherCoutsArcsEnclenches = afficherCoutsArcsEnclenches;
@@ -193,5 +236,9 @@ public class Graphe extends Parent {
 
     public boolean isAfficherCoutsArcsEnclenches() {
         return afficherCoutsArcsEnclenches;
+    }
+
+    public boolean isAfficherRangSommetsEnclenches() {
+        return afficherRangSommetsEnclenches;
     }
 }

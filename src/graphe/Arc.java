@@ -14,10 +14,12 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import sample.ArrowSecond;
+import sample.Fenetre;
 
 import static graphe.Sommet.SOMMET_RADIUS;
 
@@ -25,22 +27,25 @@ public class Arc extends Parent {
     private int cout;
     private final Sommet depart;
     private final Sommet arrivee;
-    private ArrowSecond arrow;
-    private Line line;
-    private StackPane stackPaneCout;
-    private Graphe graphe;
+
+    //Elements graphiques
+    private ArrowSecond arrow;          // Flèche de l'arc
+    private Line line;                  // Ligne de l'arc
+    private StackPane stackPaneCout;    // StackPane affichant le coût de l'arc
 
 
     public Arc(int cout, Sommet depart, Sommet arrivee, Graphe graphe) {
         this.cout = cout;
         this.depart = depart;
-        this.graphe = graphe;
         this.arrivee = arrivee;
+
+        // Définition des éléments graphiques
         stackPaneCout = new StackPane();
         line = new Line();
         line.setStrokeWidth(2);
         line.setStroke(Color.BLACK);
         setLine();
+        // Définition d'un click listener lorsqu'on clique sur un arc
         line.setOnMouseClicked(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent t) {
                 if (t.getButton() == MouseButton.SECONDARY) {
@@ -55,6 +60,7 @@ public class Arc extends Parent {
                         public void handle(ActionEvent event) {
                             graphe.getArcs().remove(Arc.this);
                             graphe.getPane().getChildren().remove(Arc.this);
+                            Fenetre.changementsEffectues = true;
                         }
                     });
                     contextMenu.getItems().addAll(item1);
@@ -70,20 +76,26 @@ public class Arc extends Parent {
             }
         });
 
+        // Coordonnées des points de la flèche (créant un triangle)
         double[] points = {0.0, 7.0, -7.0, -7.0, 7.0, -7.0};
         arrow = new ArrowSecond(points, line);
+
+        // Ajout des éléments graphiques
         getChildren().addAll(arrow, line, stackPaneCout);
 
-        if (!graphe.isAfficherCoutsArcsEnclenches()) {
-            stackPaneCout.setVisible(false);
-        }
+        stackPaneCout.setVisible(graphe.isAfficherCoutsArcsEnclenches());
+
+        // Elements graphique du coût de l'arc
         Text textCout = new Text(cout + "");
         Circle circle = new Circle(10, Color.LIGHTGRAY);
         circle.setStrokeWidth(2);
         circle.setStroke(Color.BLACK);
         stackPaneCout.getChildren().addAll(circle, textCout);
         stackPaneCout.toFront();
+
+        // Ajout d'un click listener lorsqu'on clique sur le coût de l'arc
         stackPaneCout.setOnMouseClicked(mouseEvent -> {
+            // Si on double-clique, on affiche une boîte de dialogue permettant de renseigner le coût
             if(mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount() == 2){
                 TextInputDialog dialog = new TextInputDialog();
                 dialog.setTitle("Renseignement d'information");
@@ -100,6 +112,7 @@ public class Arc extends Parent {
                         alert.show();
                     }
                     if (c != Integer.MAX_VALUE) {
+                        // Redéfinition du coût
                         this.cout = c;
                         textCout.setText(c + "");
                     }
@@ -109,6 +122,22 @@ public class Arc extends Parent {
         setLine();
     }
 
+    public void setColor(Paint paint) {
+        line.setStroke(paint);
+        arrow.setFill(paint);
+    }
+    public void resetArcDisplay() {
+        setColor(Color.BLACK);
+        line.getStrokeDashArray().clear();
+    }
+    public void setDash() {
+        line.getStrokeDashArray().addAll(25.0, 10.0);
+        setColor(Color.BLACK);
+    }
+
+    /**
+     * Met à jour les coordonnées de la flèche et la ligne de l'arc, ainsi que le coût
+     */
     public void setLine() {
         double centerDepartX = (depart.getCercle().getLayoutX()) + depart.getLayoutX();
         double centerDepartY = (depart.getCercle().getLayoutY()) + depart.getLayoutY();

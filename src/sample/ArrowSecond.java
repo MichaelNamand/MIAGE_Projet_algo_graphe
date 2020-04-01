@@ -33,6 +33,10 @@ public class ArrowSecond extends Polygon {
         setTranslateY(line.getEndY() - subtractHeight);
     }
 
+    public Line getLine() {
+        return line;
+    }
+
     public void update(){
         initialize();
     }
