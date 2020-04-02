@@ -270,4 +270,9 @@ public class Sommet extends StackPane {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+
+
+
+
 }

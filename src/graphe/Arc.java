@@ -202,4 +202,5 @@ public class Arc extends Parent implements Comparable<Arc>{
         return "depart=" + depart.id() +
                 " arrivee=" + arrivee.id();
     }
+
 }

@@ -1,9 +1,6 @@
 package sample;
 
-import algorithmes.Distance;
-import algorithmes.Ordonnancement;
-import algorithmes.Rang;
-import algorithmes.Tarjan;
+import algorithmes.*;
 import graphe.Arc;
 import graphe.Graphe;
 import graphe.Sommet;
@@ -71,6 +68,7 @@ public class Fenetre extends Parent {
         Menu menuOrdonnancement = new Menu("Problème d'ordonnancement");
         Menu menuDistance = new Menu("Calcul distance");
         Menu menuTarjan = new Menu("CFC selon Tarjan");
+        Menu menuKruskal = new Menu("Algorithme de Kruskal");
 
         // Création des sous-menus des algorithmes gérant leur lancement
         MenuItem menuDistanceLancer = new MenuItem("Lancer");
@@ -133,7 +131,36 @@ public class Fenetre extends Parent {
         });
         menuTarjan.getItems().add(menuTarjanLancer);
 
-        menuAlgorithmes.getItems().addAll(menuRang, menuOrdonnancement, menuDistance, menuTarjan);
+        MenuItem menuKruskalLancer = new MenuItem("Lancer");
+        menuKruskalLancer.setOnAction(t -> {
+            //Kruskal renvoie un tableau d'arcs
+            Arc[] arcs = Kruskal.kruskal(graphe);
+
+            StackPane stackPane = new StackPane();
+            Button button = new Button("Fermer");
+            button.setOnMouseClicked(f -> {
+                border.setRight(null);
+            });
+            String s = "";
+            for(int i = 0; i < arcs.length; i++) {
+                //s += arcs[i].getDepart().id()+" -> "+arcs[i].getArrivee().id()+"\t"+arcs[i].getCout()+"\n";
+                s += arcs[i].getCout()+"\n";
+                System.out.println(s);
+            }
+            Text text = new Text(s);
+            stackPane.getChildren().addAll(button, text);
+            StackPane.setAlignment(button, Pos.TOP_RIGHT);
+            StackPane.setAlignment(text, Pos.TOP_LEFT);
+            Fenetre.rafraichirInterface();
+            border.setRight(stackPane);
+
+        });
+        menuKruskal.getItems().add(menuKruskalLancer);
+
+        //Ajouts des éléments au menu algorithme
+        menuAlgorithmes.getItems().addAll(menuRang, menuOrdonnancement, menuDistance, menuTarjan, menuKruskal);
+
+
 
         // Ajout des éléments au menu
         menu.getItems().addAll(menuCreer, menuOuvrir, menuEnregistrer);
