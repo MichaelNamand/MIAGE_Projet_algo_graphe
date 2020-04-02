@@ -29,7 +29,6 @@ public class Kruskal {
         //fin du tri
 
         int n = graphe.getSommets().size();
-        System.out.println("Size = "+n);
         int[] prem = new int[n + 1];
         int[] pilch = new int[n + 1];
         int[] cfc = new int[n + 1];
