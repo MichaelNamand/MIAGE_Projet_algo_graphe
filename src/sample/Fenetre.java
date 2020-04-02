@@ -159,7 +159,7 @@ public class Fenetre extends Parent {
         menuKruskal.getItems().add(menuKruskalLancer);
 
 //de ici j'ai fais un genre de copier coller et j'ai changer le nom pour afficher dans la fenêtre
-       /* MenuItem menuDijkstraLancer = new MenuItem("Lancer");
+        MenuItem menuDijkstraLancer = new MenuItem("Lancer");
         menuDijkstraLancer.setOnAction(t -> {
 
             Dijkstra.dijkstra(graphe);
@@ -179,7 +179,7 @@ public class Fenetre extends Parent {
             border.setRight(stackPane2);
 
         });
-        menuDijkstra.getItems().add(menuDijkstraLancer);*/
+        menuDijkstra.getItems().add(menuDijkstraLancer);
 
 
 
@@ -201,7 +201,7 @@ public class Fenetre extends Parent {
 
 
         //Ajouts des éléments au menu algorithme
-        menuAlgorithmes.getItems().addAll(menuRang, menuOrdonnancement, menuDistance, menuTarjan, menuKruskal);
+        menuAlgorithmes.getItems().addAll(menuRang, menuOrdonnancement, menuDistance, menuTarjan, menuKruskal, menuDijkstra);
 
 
 
