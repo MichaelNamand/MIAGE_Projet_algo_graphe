@@ -176,6 +176,10 @@ public class Arc extends Parent implements Comparable<Arc>{
         return cout;
     }
 
+    public void setCout(int cout) {
+        this.cout = cout;
+    }
+
     public Sommet getDepart() {
         return depart;
     }
