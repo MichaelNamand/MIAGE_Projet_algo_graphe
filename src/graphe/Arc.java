@@ -23,7 +23,11 @@ import sample.Fenetre;
 
 import static graphe.Sommet.SOMMET_RADIUS;
 
-public class Arc extends Parent {
+/**
+ * Arc
+ * Gère la manipulation d'un arc graphiquement (gestion des clics utilisateurs) et logiquement.
+ */
+public class Arc extends Parent implements Comparable<Arc>{
     private int cout;
     private final Sommet depart;
     private final Sommet arrivee;
@@ -155,6 +159,7 @@ public class Arc extends Parent {
             double angle = Math.toDegrees(Math.atan2(centerArriveeY - centerDepartY, centerArriveeX - centerDepartX));
             stackPaneCout.setLayoutX((arrow.getTranslateX() + centerDepartX + SOMMET_RADIUS / 2 * Math.cos(Math.toRadians(angle)) - stackPaneCout.getWidth()) / 2);
             stackPaneCout.setLayoutY((arrow.getTranslateY() + centerDepartY + 10 * Math.sin(Math.toRadians(angle)) - stackPaneCout.getHeight()) / 2);
+            arrow.update();
         }
     }
 
@@ -181,5 +186,16 @@ public class Arc extends Parent {
 
     public ArrowSecond getArrow() {
         return arrow;
+    }
+
+    @Override
+    public int compareTo(Arc arc) {
+        return arrivee.id() - arc.arrivee.id();
+    }
+
+    @Override
+    public String toString() {
+        return "depart=" + depart.id() +
+                " arrivee=" + arrivee.id();
     }
 }

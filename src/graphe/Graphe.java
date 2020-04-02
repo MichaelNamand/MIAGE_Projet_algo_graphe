@@ -13,8 +13,16 @@ import javafx.scene.text.Text;
 import sample.Fenetre;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
+/**
+ * Graphe
+ * Cette classe gère toute la partie affichage et gestion d'un graphe.
+ * Elle gère donc les sommets et les arcs définissant un graphe et son interface utilisateur.
+ * Grâce à cette classe, on peut gérer la création, modification et suppression d'un arc ou sommet graphiquement et logiquement.
+ */
 public class Graphe extends Parent {
+    // Modèle d'un graphe :
     private ArrayList<Sommet> sommets = new ArrayList<>();
     private ArrayList<Arc> arcs = new ArrayList<>();
     private String nom;
@@ -59,6 +67,7 @@ public class Graphe extends Parent {
                         ajouterSommet(new Sommet(idIncrement, t.getSceneX(), t.getSceneY(), -1, "Sans nom", Graphe.this));
                     }
                     Fenetre.changementsEffectues = true;
+                    // A chaque création d'un sommet, idIncrement s'incrémente pour définir le nouvel id d'un futur sommet créé
                     idIncrement++;
                 }
             }
@@ -68,6 +77,11 @@ public class Graphe extends Parent {
         this.getChildren().add(pane);
     }
 
+    /**
+     * Ajoute un sommet dans le graphe.
+     * D'abord on l'ajoute dans la liste sommets puis dans la fenêtre graphique.
+     * @param s
+     */
     public void ajouterSommet(Sommet s) {
         sommets.add(s);
         pane.getChildren().add(s);
@@ -77,8 +91,15 @@ public class Graphe extends Parent {
         return arcs;
     }
 
+    /**
+     * Ajoute un arc dans le graphe, puis on l'affiche graphiquement
+     * @param arc
+     * @return true si l'ajout s'est effectué | false sinon
+     */
     public boolean ajouterArc(Arc arc) {
         for (Arc a : arcs) {
+            // Si un arc dans la liste d'arcs du graphe a les mêmes sommets départ et arrivé, on ne l'ajoute pas
+            // et on avertir l'utilisateur
             if (a.getDepart().id() == arc.getDepart().id() && a.getArrivee().id() == arc.getArrivee().id()) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Impossible de créer l'arc");
@@ -90,10 +111,36 @@ public class Graphe extends Parent {
         }
         arcs.add(arc);
         pane.getChildren().add(arc);
-        arc.getDepart().getCercle().setFill(Color.LIGHTBLUE);
+        // Si l'utilisateur a enclenché le bouton "Créer des arcs", on colore le sommet dans sa couleur initiale : LIGHTBLUE
+        if (isCreationArcsEnclenches())
+            arc.getDepart().getCercle().setFill(Color.LIGHTBLUE);
+        // On vide le sommet tampon permettant de sauvegarder le 1er sommet cliqué
         premierSommetRelie = null;
+        // Met au premier plan l'arc (sa ligne + sa flèche)
         arc.getDepart().toFront(); arc.getArrivee().toFront();
         return true;
+    }
+
+    public int[][] getFsAps() {
+        int[] aps = new int[sommets.size() + 1];
+        int[] fs = new int[arcs.size() + sommets.size() + 1];
+        aps[0] = sommets.size();
+        fs[0] = arcs.size() + sommets.size();
+
+        int i = 1, j = 1;
+        for (Sommet sommet : sommets) {
+            aps[j] = i;
+            j++;
+            for (Sommet successeur : getSuccesseursSommet(sommet)) {
+                fs[i] = successeur.id();
+                i++;
+            }
+            fs[i] = 0;
+            i++;
+        }
+        int[][] res = new int[2][];
+        res[0] = fs; res[1] = aps;
+        return res;
     }
 
     public ArrayList<Sommet> getSommets() {
@@ -130,8 +177,14 @@ public class Graphe extends Parent {
         return premierSommetRelie;
     }
 
+    /**
+     * Retourne la liste de tous les successeurs du sommet passé en paramètre
+     * @param s
+     * @return
+     */
     public ArrayList<Sommet> getSuccesseursSommet(Sommet s) {
         ArrayList<Sommet> successeurs = new ArrayList<>();
+        Collections.sort(arcs);
         for (Arc arc : arcs) {
             if (arc.getDepart().id() == s.id()) {
                 successeurs.add(arc.getArrivee());
@@ -140,8 +193,14 @@ public class Graphe extends Parent {
         return successeurs;
     }
 
+    /**
+     * Retourne la liste de tous les prédécesseurs du sommet passé en paramètre
+     * @param s
+     * @return
+     */
     public ArrayList<Sommet> getPredecesseursSommet(Sommet s) {
         ArrayList<Sommet> predecesseurs = new ArrayList<>();
+        Collections.sort(arcs);
         for (Arc arc : arcs) {
             if (arc.getArrivee().id() == s.id()) {
                 predecesseurs.add(arc.getDepart());
@@ -191,6 +250,10 @@ public class Graphe extends Parent {
         this.creationArcsEnclenches = creationArcsEnclenches;
     }
 
+    /**
+     * Affiche ou non le nom (la valeur) d'un sommet plutôt que son id
+     * @param afficherNomsSommetsEnclenches
+     */
     public void setAfficherNomsSommetsEnclenches(boolean afficherNomsSommetsEnclenches) {
         this.afficherNomsSommetsEnclenches = afficherNomsSommetsEnclenches;
         for (Sommet s : sommets) {
@@ -203,6 +266,11 @@ public class Graphe extends Parent {
         }
         setAfficherCoutsArcsEnclenches(isAfficherCoutsArcsEnclenches());
     }
+
+    /**
+     * Affiche ou non le rang des sommets
+     * @param afficherRangSommetsEnclenches
+     */
     public void setAfficherRangSommetsEnclenches(boolean afficherRangSommetsEnclenches) {
         this.afficherRangSommetsEnclenches = afficherRangSommetsEnclenches;
         for (Sommet s : getSommets()) {
@@ -210,6 +278,10 @@ public class Graphe extends Parent {
         }
     }
 
+    /**
+     * Affiche ou non le coût les arcs
+     * @param afficherCoutsArcsEnclenches
+     */
     public void setAfficherCoutsArcsEnclenches(boolean afficherCoutsArcsEnclenches) {
         this.afficherCoutsArcsEnclenches = afficherCoutsArcsEnclenches;
         for (Arc a : arcs) {
@@ -240,5 +312,18 @@ public class Graphe extends Parent {
 
     public boolean isAfficherRangSommetsEnclenches() {
         return afficherRangSommetsEnclenches;
+    }
+
+    /**
+     * Après lancement d'un algorithme, la couleur des arcs et sommets a pu être modifiée. Cette méthode rétablit
+     * leur couleur par défaut.
+     */
+    public void retablirAffichage() {
+        for (Arc arc : arcs) {
+            arc.resetArcDisplay();
+        }
+        for (Sommet sommet : sommets) {
+            sommet.getCercle().setFill(Color.LIGHTBLUE);
+        }
     }
 }

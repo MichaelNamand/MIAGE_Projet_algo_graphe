@@ -20,19 +20,24 @@ import sample.Fenetre;
 
 import java.util.Objects;
 
+/**
+ * Sommet
+ * Gère la partie affichage et gestion d'un sommet.
+ */
 public class Sommet extends StackPane {
     private int id;
     private String valeur;
     private int rang;
 
-    static public double SOMMET_RADIUS = 20;
-    double x, y;
-    private Circle cercle;
-    private Text nomAffichage;
-    private StackPane rangAffichage;
+    static public double SOMMET_RADIUS = 20;    // Diamètre du cercle du sommet
+    public double x, y;                         // Coordonnées du sommet dans le graphe
+    private Circle cercle;                      // Cercle (élément graphique) composant le sommet
+    private Text nomAffichage;                  // Texte (élément graphique) affichant la valeur / id du sommet
+    private Text dureeAffichage;                // Texte (élément graphique) affichant la durée / longueur du sommet
+    private StackPane rangAffichage;            // StackPane (élément graphique) affichant le rang du sommet
 
-    public Sommet(Sommet s, Graphe g) {
-        this(s.id(), s.getX(), s.getY(), s.getRang(), s.getValeur(), g);
+    public Sommet(int id, String valeur, Graphe g) {
+        this(id, 0, 0, 0, valeur, g);
     }
 
     public Sommet(int id, double x, double y, int rang, String valeur, Graphe graphe) {
@@ -44,33 +49,38 @@ public class Sommet extends StackPane {
         this.x = x; this.y = y;
         // Texte affiché sur le sommet (id ou valeur)
         nomAffichage = new Text(graphe.isAfficherNomsSommetsEnclenches() ? valeur : id + "");
+
+        // Création de l'affichage du rang du sommet
         rangAffichage = new StackPane();
+        // L'affichage est composé d'un texte...
         Text textRang = new Text(rang == -1 ? "+∞" : rang + "");
+        // et d'un rectangle entourant le texte
         Rectangle rectangleRang = new Rectangle(18, 18, Color.LIGHTGRAY);
         rectangleRang.setStrokeWidth(1);
         rectangleRang.setStroke(Color.BLACK);
+
         rangAffichage.getChildren().addAll(rectangleRang, textRang);
 
-        // Création du contenu graphique (cercle et positionnement)
+        // Création du contenu graphique du sommet (cercle et positionnement)
         cercle = new Circle();
         cercle.setStroke(Color.BLACK);
         cercle.setStrokeWidth(2);
         cercle.setFill(Color.LIGHTBLUE);
 
+        dureeAffichage = new Text();
         // Ajout du contenu graphique dans le StackPane (layout)
-        getChildren().addAll(cercle, nomAffichage, rangAffichage);
+        getChildren().addAll(cercle, nomAffichage, rangAffichage, dureeAffichage);
         setStyleSommet(graphe.isAfficherNomsSommetsEnclenches());
         rangAffichage.setVisible(graphe.isAfficherRangSommetsEnclenches());
 
-        setLayoutX(x - getSommetRadius());
-        setLayoutY(y - getSommetRadius() * 2);
         setCursor(Cursor.HAND);
         setOnMousePressed((t) -> {
             this.x = t.getSceneX();
             this.y = t.getSceneY();
         });
         setPrefHeight(44);
-        // Gestion du déplacement d'un sommet
+        // Gestion du déplacement d'un sommet. On doit mettre à jour non seulement la position du sommet mais aussi ses
+        // éventuels arcs.
         setOnMouseDragged((t) -> {
             double offsetX = t.getSceneX() - this.x;
             double offsetY = t.getSceneY() - this.y;
@@ -85,7 +95,6 @@ public class Sommet extends StackPane {
                 arc.setLine();
                 arc.getArrow().update();
             }
-            cercle.setFill(Color.LIGHTBLUE);
             Fenetre.changementsEffectues = true;
         });
         // Création du menu contextuel lorsqu'on clique droit sur un sommet
@@ -98,6 +107,7 @@ public class Sommet extends StackPane {
         // Gestion du clic Supprimer
         item1.setOnAction(event -> {
             Graphe.idIncrement--;
+            // Avant suppression, on réaffecte les ids des autres sommets supérieurs à celui qu'on supprime
             for (Sommet s : graphe.getSommets()) {
                 if (s.id() > Sommet.this.id) {
                     s.decrementeId();
@@ -105,12 +115,15 @@ public class Sommet extends StackPane {
                 }
             }
             graphe.getSommets().remove(Sommet.this);
+
+            // On supprime tous les arcs reliés à ce sommet
             while (graphe.getArcFromSommet(Sommet.this) != null) {
                 Arc a = graphe.getArcFromSommet(Sommet.this);
                 graphe.getPane().getChildren().remove(a);
                 graphe.getArcs().remove(a);
             }
             Fenetre.changementsEffectues = true;
+            // Et on l'enlève graphiquement du graphe
             graphe.getPane().getChildren().remove(Sommet.this);
         });
         // Gestion du clic Renommer
@@ -135,14 +148,19 @@ public class Sommet extends StackPane {
         // Gestion du clic d'un sommet
         setOnMouseClicked(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent t) {
+                // Si le bouton "Créer des arcs" est enclenché
                 if(t.getButton() == MouseButton.PRIMARY && graphe.isCreationArcsEnclenches()) {
+                    // On regarde s'il a déjà cliqué sur un ancien sommet
                     if (graphe.getPremierSommetRelie() == null) {
+                        // Si non, on enregistre le premier sommet
                         graphe.setPremierSommetRelie(Sommet.this);
                         getCercle().setFill(Color.LIGHTGREEN);
                     } else if (graphe.getPremierSommetRelie().id == Sommet.this.id) {
+                        // S'il reclique sur le même sommet, on annule la création de l'arc
                         getCercle().setFill(Color.LIGHTBLUE);
                         graphe.setPremierSommetRelie(null);
                     } else {
+                        // Si oui, on créé l'arc et on l'ajoute graphiquement au graphe
                         Arc arc = new Arc(1, graphe.getPremierSommetRelie(), Sommet.this, graphe);
                         if (graphe.ajouterArc(arc)) {
                             getCercle().setFill(Color.LIGHTBLUE);
@@ -155,7 +173,16 @@ public class Sommet extends StackPane {
                 }
             }
         });
+
+        setLayoutX(x - getSommetRadius());
+        setLayoutY(y - getSommetRadius() * 2);
     }
+
+    /**
+     * Met à jour le noeud dureeAffichage avec le texte passé en paramètre
+     * @param duree
+     */
+    public void setDureeAffichage(int duree) { dureeAffichage.setText("(" + duree + ")"); }
 
     public StackPane getRangAffichage() {
         return rangAffichage;
@@ -169,6 +196,10 @@ public class Sommet extends StackPane {
         id--;
     }
 
+    /**
+     * Met à jour le noeud affichant le rang du sommet
+     * @param rang
+     */
     public void setRang(int rang) {
         this.rang = rang;
         Text text = (Text) rangAffichage.getChildren().get(1);
@@ -194,7 +225,12 @@ public class Sommet extends StackPane {
     public String getValeur() { return valeur; }
 
     public void setValeur(String valeur) { this.valeur = valeur; }
-    
+
+    /**
+     * Suivant les paramètres utilisateur, un sommet a deux types d'affichage : L'un avec sa valeur, l'autre
+     * avec son id.
+     * @param parValeur
+     */
     public void setStyleSommet(boolean parValeur) {
         if (parValeur) {
             Sommet.SOMMET_RADIUS = 5;
@@ -209,6 +245,9 @@ public class Sommet extends StackPane {
         }
         rangAffichage.setTranslateX(rangAffichage.getLayoutX() + getSommetRadius());
         rangAffichage.setTranslateY(rangAffichage.getLayoutY() - getSommetRadius());
+
+        dureeAffichage.setTranslateX(rangAffichage.getLayoutX() - getSommetRadius());
+        dureeAffichage.setTranslateY(rangAffichage.getLayoutY() + getSommetRadius());
     }
 
     @Override

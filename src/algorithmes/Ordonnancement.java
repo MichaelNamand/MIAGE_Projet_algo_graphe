@@ -6,13 +6,14 @@ import graphe.Sommet;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Ordonnancement {
-    private static ArrayList<Sommet> sommetsParcourus;
     public static void setOrdonnancement(Graphe graphe) {
-        sommetsParcourus = new ArrayList<>();
+        graphe.retablirAffichage();
         Rang.setRang(graphe);
+        graphe.getSommet(1).setDureeAffichage(0);
+        graphe.getSommet(1).getCercle().setFill(Color.LIGHTGREEN);
+
         int i = 1, n = graphe.getSommets().size();
         int[] L = new int[n + 1];
         L[i] = 0;
@@ -28,9 +29,12 @@ public class Ordonnancement {
                 }
                 Arc arc = graphe.getArcFromSommets(sommetPlusLong, graphe.getSommet(i));
                 L[i] = L[sommetPlusLong.id()] + arc.getCout();
-                graphe.getSommet(i).setRang(L[i]);
+                graphe.getSommet(i).setDureeAffichage(L[i]);
             }
         }
+        int idSommetMax = 0;
+        for (int j = 1; j <= n; j++) if (idSommetMax < L[j]) idSommetMax = j;
+        graphe.getSommet(idSommetMax).getCercle().setFill(Color.LIGHTGREEN);
         // Affichage du chemin critique
         int[] nbArcSuivDashedSommets = new int[n + 1];
         for (Sommet sommet : graphe.getSommets()) {
@@ -53,14 +57,12 @@ public class Ordonnancement {
                 }
             }
         }
-        System.out.println(Arrays.toString(nbArcSuivDashedSommets));
         for (Sommet sommet : graphe.getSommets()) {
             if (graphe.getSuccesseursSommet(sommet).size() <= nbArcSuivDashedSommets[sommet.id()] && graphe.getSuccesseursSommet(sommet).size() > 0) {
                 for (Sommet sommetPredecesseur : graphe.getPredecesseursSommet(sommet)) {
                     Arc arc = graphe.getArcFromSommets(sommetPredecesseur, sommet);
                     arc.setDash();
                 }
-                System.out.println(Arrays.toString(nbArcSuivDashedSommets));
             }
         }
     }

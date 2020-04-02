@@ -1,12 +1,15 @@
 package sample;
 
+import algorithmes.Distance;
 import algorithmes.Ordonnancement;
 import algorithmes.Rang;
+import algorithmes.Tarjan;
 import graphe.Arc;
 import graphe.Graphe;
 import graphe.Sommet;
 import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -14,7 +17,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -22,16 +27,22 @@ import javafx.util.Duration;
 import java.io.*;
 import java.util.Scanner;
 
+/**
+ * Fenetre
+ * Littérallement la fenêtre de notre application. C'est ici qu'on gère tous les menus et boutons de gestion d'un graphe
+ */
 public class Fenetre extends Parent {
-    private Graphe graphe;
-    private BorderPane border = new BorderPane();
-    private ScrollPane scrollPane = new ScrollPane();
-    private Stage primaryStage;
-    public static boolean changementsEffectues = false;
+    private Graphe graphe;                                  // Graphe courant
+    private BorderPane border = new BorderPane();           // BorderPane (élément graphique) gérant la disposition des noeuds de la fenêtre
+    private ScrollPane scrollPane = new ScrollPane();       // ScrollPane (élément graphique) contenant le graphe
+    private Stage primaryStage;                             // Racine de notre application graphique
+    public static boolean changementsEffectues = false;     // Boolean indiquant si des changements ont été fait au graphe
 
-    private CheckBox cbRangsSommets;
-    private CheckBox cbArcsCouts;
-    private CheckBox cbNomsSommets;
+    // Checkbox de paramètres utilisateur
+    private CheckBox cbRangsSommets;                        // Checkbox "Afficher le rang des sommets"
+    private CheckBox cbArcsCouts;                           // Checkbox "Afficher le coût des arcs"
+    private CheckBox cbNomsSommets;                         // Checkbox "Afficher le nom des sommets"
+
     public Fenetre(Stage stage) {
         // Images de l'application
         Image imageAjouter = new Image(getClass().getResourceAsStream("/assets/icons/plus.png"));
@@ -55,17 +66,23 @@ public class Fenetre extends Parent {
         MenuItem menuEnregistrer = new MenuItem("Enregistrer...", new ImageView(imageEnregistrer));
         menuEnregistrer.setOnAction(t -> { enregistrerModifications(); });
 
+        // Création de menus des algorithmes
         Menu menuRang = new Menu("Algorithme du rang");
         Menu menuOrdonnancement = new Menu("Problème d'ordonnancement");
+        Menu menuDistance = new Menu("Calcul distance");
+        Menu menuTarjan = new Menu("CFC selon Tarjan");
+
+        // Création des sous-menus des algorithmes gérant leur lancement
+        MenuItem menuDistanceLancer = new MenuItem("Lancer");
+        menuDistanceLancer.setOnAction(t -> { Distance.distance(graphe); });
+        menuDistance.getItems().add(menuDistanceLancer);
 
         MenuItem menuOrdonnancementLancer = new MenuItem("Lancer");
         MenuItem menuOrdonnancementRetablir = new MenuItem("Rétablir");
         menuOrdonnancementLancer.setOnAction(t -> { Ordonnancement.setOrdonnancement(graphe); });
-        menuOrdonnancementRetablir.setOnAction(t -> {
-            for (Arc arc : graphe.getArcs()) {
-                arc.resetArcDisplay();
-            }
-        });
+        menuOrdonnancementRetablir.setOnAction(t -> { graphe.retablirAffichage(); });
+        menuOrdonnancement.getItems().addAll(menuOrdonnancementLancer, menuOrdonnancementRetablir);
+
         MenuItem menuRangLancer = new MenuItem("Lancer");
         menuRangLancer.setOnAction(t -> {
             Rang.setRang(graphe);
@@ -75,9 +92,48 @@ public class Fenetre extends Parent {
             }
         });
         menuRang.getItems().add(menuRangLancer);
-        menuOrdonnancement.getItems().addAll(menuOrdonnancementLancer, menuOrdonnancementRetablir);
 
-        menuAlgorithmes.getItems().addAll(menuRang, menuOrdonnancement);
+        MenuItem menuTarjanLancer = new MenuItem("Lancer");
+        menuTarjanLancer.setOnAction(t -> {
+            // L'algorithme tarjan renvoie le graphe réduit
+            Graphe grapheReduit = Tarjan.tarjan(graphe);
+
+            // On gère ici l'affichage dynamique de ses sommets
+            int N = grapheReduit.getSommets().size();
+            for (int i = 0; i < N; i++) {
+                double x = 150.0f + 100 * Math.cos(Math.PI * 2 * i / N);
+                double y = 150.0f + 100 * Math.sin(Math.PI * 2 * i / N);
+                Sommet sommet = grapheReduit.getSommet(i + 1);
+                sommet.setLayoutX(x);
+                sommet.setLayoutY(y);
+            }
+            // stackPane pour afficher le graphe, du texte et un bouton
+            StackPane stackPane = new StackPane();
+
+            Button button = new Button("Fermer");
+            button.setOnMouseClicked(f -> {
+                border.setRight(null);
+            });
+            grapheReduit.getPane().setPrefWidth(300);
+            grapheReduit.getPane().setPrefHeight(400);
+            for (Arc arc : grapheReduit.getArcs()) {
+                arc.getArrow().update();
+                arc.setLine();
+            }
+            Text info  = new Text("Graphe réduit : Du à un bug d'affichage, \ndéplacer un sommet pour remettre en \nplace leurs arcs");
+            stackPane.getChildren().addAll(grapheReduit, button, info);
+
+            // Positionnement des éléments graphiques
+            StackPane.setAlignment(button, Pos.TOP_RIGHT);
+            StackPane.setAlignment(info, Pos.TOP_LEFT);
+            StackPane.setAlignment(grapheReduit, Pos.TOP_LEFT);
+
+            Fenetre.rafraichirInterface();
+            border.setRight(stackPane);
+        });
+        menuTarjan.getItems().add(menuTarjanLancer);
+
+        menuAlgorithmes.getItems().addAll(menuRang, menuOrdonnancement, menuDistance, menuTarjan);
 
         // Ajout des éléments au menu
         menu.getItems().addAll(menuCreer, menuOuvrir, menuEnregistrer);
@@ -144,6 +200,10 @@ public class Fenetre extends Parent {
         }
     }
 
+    /**
+     * Du à un bug non connu, cette méthode affiche un message d'information, permettant à l'interface
+     * de se mettre à jour
+     */
     public static void rafraichirInterface() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Patientez...");
@@ -156,6 +216,11 @@ public class Fenetre extends Parent {
         alert.showAndWait();
     }
 
+    /**
+     * Affiche une boîte de dialogue demandant à l'utilisateur de saisir du texte
+     * @param titre
+     * @return
+     */
     public static TextInputDialog getTextInputFromDialog(String titre) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Renseignement d'information");
@@ -164,6 +229,9 @@ public class Fenetre extends Parent {
         return dialog;
     }
 
+    /**
+     * Lorsque l'utilisateur clique sur Enregistrer le graphe
+     */
     public void enregistrerModifications() {
         if (graphe != null) {
             if (graphe.getNom().equals("Sans nom")) {
@@ -177,6 +245,7 @@ public class Fenetre extends Parent {
                 sauvegardeFichier();
             }
         } else {
+            // Si aucun graphe ouvert
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Aucun graphe ouvert");
             alert.setHeaderText("Créez ou ouvrez un graphe pour procéder à son enregistrement !");
@@ -184,6 +253,10 @@ public class Fenetre extends Parent {
         }
     }
 
+    /**
+     * Méthode qui demande à l'utilisateur la destination du fichier de sauvegarde, puis écrit les informations du graphe
+     * dessus.
+     */
     public void sauvegardeFichier() {
         FileChooser fileChooser = new FileChooser();
         //Set extension filter for text files
@@ -238,7 +311,14 @@ public class Fenetre extends Parent {
         }
     }
 
+    /**
+     * Ajoute le graphe passé en paramètre dans notre scrollPane ainsi que les boutons de configuration du footer
+     * (Créer des sommets, des arcs, ...)
+     * @param g
+     * @param debugArc
+     */
     public void setGraphe(Graphe g, boolean debugArc) {
+        // Si on détecte qu'un changement dans le graphe a été effectué, on demande à l'utilisateur de l'enregistrer
         if (!debugArc && Fenetre.changementsEffectues) {
             Alert alert = getConfirmationQuitter(g, "Si vous créer un nouveau graphe, celui actuel risque " +
                     "de perdre des informations non enregistrées");
@@ -258,23 +338,33 @@ public class Fenetre extends Parent {
         Graphe.idIncrement = 1;
         graphe = g;
 
+        // Ajout du graphe dans notre  scrollpane
         scrollPane.setContent(graphe);
+        // On lui met un fond gris
         scrollPane.setStyle("-fx-background-color: lightgray, white ;" +
                 "    -fx-background-insets: 0, 5 ;");
+
+        // Ajout du scrollpane dans notre fenêtre
         border.setCenter(scrollPane);
+
+        // Définition du footer
         HBox flow = new HBox();
         flow.setPadding(new Insets(10, 0, 10, 10));
         flow.setSpacing(10); // preferred width allows for two columns
         flow.setStyle("-fx-background-color: DAE6F3;");
+
+        // Images des deux boutons du footer
         Image imageSommet = new Image(getClass().getResourceAsStream("/assets/icons/pin.png"));
         Image imageArc = new Image(getClass().getResourceAsStream("/assets/icons/link.png"));
 
+        // Boutons du footer
         ToggleGroup group = new ToggleGroup();
         ToggleButton bSommet = new ToggleButton("Créer des sommets", new ImageView(imageSommet));
         ToggleButton bArc = new ToggleButton("Créer des arcs", new ImageView(imageArc));
         bSommet.setToggleGroup(group);
         bArc.setToggleGroup(group);
 
+        // Gestion du clic du bouton "Créer des sommets"
         bSommet.setOnMouseClicked(t -> {
             if(bSommet.isSelected()) {
                 graphe.setCursor(Cursor.CROSSHAIR);
@@ -284,6 +374,8 @@ public class Fenetre extends Parent {
             graphe.setCreationArcsEnclenches(bArc.isSelected());
             graphe.setCreationSommetsEnclenches(bSommet.isSelected());
         });
+
+        // Gestion du clic du bouton "Créer des arcs"
         bArc.setOnMouseClicked(t -> {
             graphe.setCursor(Cursor.DEFAULT);
             graphe.setCreationArcsEnclenches(bArc.isSelected());
