@@ -52,6 +52,7 @@ public class Fenetre extends Parent {
         MenuBar menuBar = new MenuBar();
         Menu menu = new Menu("Menu");
         Menu menuAlgorithmes = new Menu("Algorithmes");
+        Menu menuConsole = new Menu("Console");
 
         // Création des éléments du menu
         MenuItem menuCreer = new MenuItem("Créer un nouveau graphe", new ImageView(imageAjouter));
@@ -155,6 +156,21 @@ public class Fenetre extends Parent {
         });
         menuKruskal.getItems().add(menuKruskalLancer);
 
+        //Création des éléments du menu Console
+        MenuItem menuAfficheAdj = new MenuItem("Afficher matrice d'adjacence");
+        MenuItem menuAfficheFsAps = new MenuItem("Afficher FS et APS");
+
+        menuAfficheAdj.setOnAction(t -> {
+            graphe.afficheMatAdj();
+        });
+
+        menuAfficheFsAps.setOnAction(t -> {
+            graphe.afficheFsAps();
+        });
+
+        menuConsole.getItems().addAll(menuAfficheAdj,menuAfficheFsAps);
+
+
         //Ajouts des éléments au menu algorithme
         menuAlgorithmes.getItems().addAll(menuRang, menuOrdonnancement, menuDistance, menuTarjan, menuKruskal);
 
@@ -163,7 +179,7 @@ public class Fenetre extends Parent {
         // Ajout des éléments au menu
         menu.getItems().addAll(menuCreer, menuOuvrir, menuEnregistrer);
         menu.getItems().add(new MenuItem("Quitter", new ImageView(imageQuitter)));
-        menuBar.getMenus().addAll(menu, menuAlgorithmes);
+        menuBar.getMenus().addAll(menu, menuAlgorithmes, menuConsole);
 
         // Ajout du menu au layout racine
         border.setTop(menuBar);

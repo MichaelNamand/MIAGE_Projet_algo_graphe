@@ -143,6 +143,44 @@ public class Graphe extends Parent {
         return res;
     }
 
+    public int[][] getMatAdj() {
+        int[][] matAdj = new int[sommets.size() + 1][sommets.size() + 1];
+        for(int i = 1; i < sommets.size() + 1; i++) {
+            for(int j = 1; j < sommets.size() + 1; j++) {
+                matAdj[i][j] = 0;
+            }
+        }
+        for(int i = 0; i < arcs.size(); i++) {
+            matAdj[arcs.get(i).getDepart().id()][arcs.get(i).getArrivee().id()] = arcs.get(i).getCout();
+        }
+        return matAdj;
+    }
+
+    public void afficheMatAdj() {
+        int[][] matAdj = getMatAdj();
+        System.out.println("Matrice d'adjacence :");
+        for(int i = 1; i < matAdj.length; i++) {
+            System.out.print("| ");
+            for(int j = 1; j < matAdj[i].length; j++) {
+                System.out.print(matAdj[i][j]+" | ");
+            }
+            System.out.println();
+        }
+    }
+
+    public void afficheFsAps() {
+        int[][] fsAps = getFsAps();
+        System.out.print("FS :\n| ");
+        for(int i = 1; i < fsAps[0].length; i++) {
+            System.out.print(fsAps[0][i]+" | ");
+        }
+        System.out.print("\nAPS :\n| ");
+        for(int i = 1; i < fsAps[1].length; i++) {
+            System.out.print(fsAps[1][i]+" | ");
+        }
+        System.out.println();
+    }
+
     public ArrayList<Sommet> getSommets() {
         return sommets;
     }
