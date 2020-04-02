@@ -88,7 +88,7 @@ public class Dijkstra {
         return d[i];
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         Dijkstra di = new Dijkstra();
         Graphe gr = new Graphe("lool");
         Sommet s1= new Sommet(1, "s1", gr);
@@ -98,5 +98,7 @@ public class Dijkstra {
 
 
     }
+    */
+     
 
 }
