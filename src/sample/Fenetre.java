@@ -141,15 +141,13 @@ public class Fenetre extends Parent {
             button.setOnMouseClicked(f -> {
                 border.setRight(null);
             });
-            String s = "";
+            String s = "Arcs qui ne crée pas de cycle, dans l'ordre :\n\n";
             for(int i = 0; i < arcs.length; i++) {
-                //s += arcs[i].getDepart().id()+" -> "+arcs[i].getArrivee().id()+"\t"+arcs[i].getCout()+"\n";
-                s += arcs[i].getCout()+"\n";
-                System.out.println(s);
+                s += arcs[i].getDepart().id()+" -> "+arcs[i].getArrivee().id()+"\t"+arcs[i].getCout()+"\n";
             }
             Text text = new Text(s);
             stackPane.getChildren().addAll(button, text);
-            StackPane.setAlignment(button, Pos.TOP_RIGHT);
+            StackPane.setAlignment(button, Pos.BOTTOM_CENTER);
             StackPane.setAlignment(text, Pos.TOP_LEFT);
             Fenetre.rafraichirInterface();
             border.setRight(stackPane);

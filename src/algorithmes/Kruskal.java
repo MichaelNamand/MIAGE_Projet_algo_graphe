@@ -29,6 +29,7 @@ public class Kruskal {
         //fin du tri
 
         int n = graphe.getSommets().size();
+        System.out.println("Size = "+n);
         int[] prem = new int[n + 1];
         int[] pilch = new int[n + 1];
         int[] cfc = new int[n + 1];
@@ -39,34 +40,33 @@ public class Kruskal {
             cfc[i] = i;
             nbElem[i] = 1;
         }
-        Arc[] arcs = new Arc[graphe.getSommets().size()];
+        Arc[] arcs = new Arc[graphe.getSommets().size()-1];
         Arc ar;
         int x;
         int y;
         int i = 0, j = 0;
         while(j < n - 1) {
             ar = graphe.getArcs().get(i);
-            System.out.println(i+" cout = "+graphe.getArcs().get(i).getCout());
             x = cfc[ar.getDepart().id()];
             y = cfc[ar.getArrivee().id()];
             if(x != y) {
                 arcs[j++] = graphe.getArcs().get(i);
 
                 //code de la fusion
-                if(nbElem[i] < nbElem[j]) {
-                    int aux = i;
-                    i = j;
-                    j = aux;
+                if(nbElem[x] < nbElem[y]) {
+                    int aux = x;
+                    x = y;
+                    y = aux;
                 }
-                int s = prem[j];
-                cfc[s] = i;
+                int s = prem[y];
+                cfc[s] = x;
                 while (pilch[s] != 0) {
                     s = pilch[s];
-                    cfc[s] = i;
+                    cfc[s] = x;
                 }
-                pilch[s] = prem[i];
-                prem[i] = prem[j];
-                nbElem[i] += nbElem[j];
+                pilch[s] = prem[x];
+                prem[x] = prem[y];
+                nbElem[x] += nbElem[y];
                 //fin fusion
 
             }
