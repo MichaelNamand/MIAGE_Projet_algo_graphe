@@ -70,6 +70,8 @@ public class Fenetre extends Parent {
         Menu menuDistance = new Menu("Calcul distance");
         Menu menuTarjan = new Menu("CFC selon Tarjan");
         Menu menuKruskal = new Menu("Algorithme de Kruskal");
+        Menu menuDijkstra = new Menu("Algorithme de Dijkstra"); //ici aussi j'ai ajouter
+
 
         // Création des sous-menus des algorithmes gérant leur lancement
         MenuItem menuDistanceLancer = new MenuItem("Lancer");
@@ -155,6 +157,33 @@ public class Fenetre extends Parent {
 
         });
         menuKruskal.getItems().add(menuKruskalLancer);
+
+//de ici j'ai fais un genre de copier coller et j'ai changer le nom pour afficher dans la fenêtre
+       /* MenuItem menuDijkstraLancer = new MenuItem("Lancer");
+        menuDijkstraLancer.setOnAction(t -> {
+
+            Dijkstra.dijkstra(graphe);
+
+            StackPane stackPane2 = new StackPane();
+            Button button = new Button("Fermer");
+            button.setOnMouseClicked(f -> {
+                border.setRight(null);
+            });
+            String s = "Arcs qui ne crée pas de cycle, dans l'ordre :\n\n";
+
+            Text text2 = new Text(s);
+            stackPane2.getChildren().addAll(button, text2);
+            StackPane.setAlignment(button, Pos.BOTTOM_CENTER);
+            StackPane.setAlignment(text2, Pos.TOP_LEFT);
+            Fenetre.rafraichirInterface();
+            border.setRight(stackPane2);
+
+        });
+        menuDijkstra.getItems().add(menuDijkstraLancer);*/
+
+
+
+
 
         //Création des éléments du menu Console
         MenuItem menuAfficheAdj = new MenuItem("Afficher matrice d'adjacence");
