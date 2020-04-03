@@ -115,10 +115,7 @@ public class Fenetre extends Parent {
             });
             grapheReduit.getPane().setPrefWidth(300);
             grapheReduit.getPane().setPrefHeight(400);
-            for (Arc arc : grapheReduit.getArcs()) {
-                arc.getArrow().update();
-                arc.setLine();
-            }
+            for (Arc arc : grapheReduit.getArcs()) { arc.setLine(); }
             Text info  = new Text("Graphe réduit : Du à un bug d'affichage, \ndéplacer un sommet pour remettre en \nplace leurs arcs");
             stackPane.getChildren().addAll(grapheReduit, button, info);
 
@@ -325,7 +322,8 @@ public class Fenetre extends Parent {
                 // Puis on écrit les sommets dans le fichier
                 for (Sommet s : graphe.getSommets()) {
                     try {
-                        out.write("S/" + s.id() + "/" + s.getX() + "/" + s.getY() + "/" + s.getRang() + "/" + s.getValeur());
+                        out.write("S/" + s.id() + "/" + (s.getX()) + "/" + (s.getY())
+                                + "/" + s.getRang() + "/" + s.getValeur());
                         out.newLine();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -350,6 +348,7 @@ public class Fenetre extends Parent {
                 }
             }
         }
+        Fenetre.changementsEffectues = false;
     }
 
     /**
@@ -447,6 +446,8 @@ public class Fenetre extends Parent {
 
         flow.getChildren().addAll(bSommet, bArc, vBox, cbRangsSommets);
         border.setBottom(flow);
+
+        Fenetre.changementsEffectues = false;
     }
 
     public Alert getConfirmationQuitter(Graphe g, String message) {
