@@ -7,11 +7,12 @@ import graphe.Sommet;
 import java.util.SortedMap;
 
 public class Dijkstra {
-    int INT_MAX=10;
+
 
     //int s, int[] fs, int[] aps, int[][] couts, int[] d, int[] pred
 
-    void dijkstra(Graphe graphe) {
+    public static void dijkstra(Graphe graphe) {
+        int INT_MAX=10;
 
         //initialisation variable
         int[][] fsAps = graphe.getFsAps();
@@ -27,8 +28,13 @@ public class Dijkstra {
 
             //initialisation tableau de cout
             for (int i = 0; i < graphe.getSommets().size(); i++) {
-                for (int j = 0; j < graphe.getSommets().size(); j++) {
-                    couts[i][j] = graphe.getArcFromSommets(graphe.getSommet(i), graphe.getSommet(j)).getCout();
+                for (int j = 1; j < graphe.getSommets().size(); j++)
+                {
+                    //System.out.println(graphe.getArcFromSommets(graphe.getSommet(i), graphe.getSommet(j)).getCout());
+
+                    System.out.println("init" + i);
+                    couts[i][j] = -1;
+                    System.out.println("init apres" + i);
                 }
             }
 
@@ -46,6 +52,7 @@ public class Dijkstra {
                     pred[i] = -1;
                 }
             }
+            
             inS[sommet] = true;
             int cpt = n - 1;
             while (cpt > 0) {
@@ -77,7 +84,7 @@ public class Dijkstra {
 
     }
 
-    public int dmin(int[] d,boolean[] inS){
+    public static int dmin(int[] d, boolean[] inS){
         int i=0;
 
         while ( i < inS.length && inS[i]){
@@ -99,6 +106,6 @@ public class Dijkstra {
 
     }
     */
-     
+
 
 }
