@@ -5,7 +5,10 @@ import graphe.Arc;
 import graphe.Graphe;
 import graphe.Sommet;
 import javafx.animation.PauseTransition;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
@@ -31,6 +34,7 @@ import java.util.Scanner;
 public class Fenetre extends Parent {
     private Graphe graphe;                                  // Graphe courant
     private BorderPane border = new BorderPane();           // BorderPane (élément graphique) gérant la disposition des noeuds de la fenêtre
+    private BorderPane border2 = new BorderPane();           // BorderPane (élément graphique) gérant la disposition des noeuds de la fenêtre
     private ScrollPane scrollPane = new ScrollPane();       // ScrollPane (élément graphique) contenant le graphe
     private Stage primaryStage;                             // Racine de notre application graphique
     public static boolean changementsEffectues = false;     // Boolean indiquant si des changements ont été fait au graphe
@@ -71,6 +75,7 @@ public class Fenetre extends Parent {
         Menu menuTarjan = new Menu("CFC selon Tarjan");
         Menu menuKruskal = new Menu("Algorithme de Kruskal");
         Menu menuDijkstra = new Menu("Algorithme de Dijkstra"); //ici aussi j'ai ajouter
+        Menu menuPrufer= new Menu("Algorithme de Prufer");
 
 
         // Création des sous-menus des algorithmes gérant leur lancement
@@ -159,27 +164,30 @@ public class Fenetre extends Parent {
         menuKruskal.getItems().add(menuKruskalLancer);
 
 //de ici j'ai fais un genre de copier coller et j'ai changer le nom pour afficher dans la fenêtre
-        MenuItem menuDijkstraLancer = new MenuItem("Lancer");
-        menuDijkstraLancer.setOnAction(t -> {
 
-            Dijkstra.dijkstra(graphe);
 
-            StackPane stackPane2 = new StackPane();
+
+
+        MenuItem menuPruferLancer = new MenuItem("Lancer");
+        menuKruskalLancer.setOnAction(t -> {
+
+            StackPane stackPane = new StackPane();
             Button button = new Button("Fermer");
             button.setOnMouseClicked(f -> {
                 border.setRight(null);
             });
-            String s = "Arcs qui ne crée pas de cycle, dans l'ordre :\n\n";
-
-            Text text2 = new Text(s);
-            stackPane2.getChildren().addAll(button, text2);
+            String s = "Suite de Prüfer :\n\n" + Prufer.affichePrufer(graphe);
+            Text text3 = new Text(s);
+            stackPane.getChildren().addAll(button, text3);
             StackPane.setAlignment(button, Pos.BOTTOM_CENTER);
-            StackPane.setAlignment(text2, Pos.TOP_LEFT);
+            StackPane.setAlignment(text3, Pos.TOP_LEFT);
             Fenetre.rafraichirInterface();
-            border.setRight(stackPane2);
+            border.setRight(stackPane);
 
         });
-        menuDijkstra.getItems().add(menuDijkstraLancer);
+
+
+        menuPrufer.getItems().add(menuPruferLancer);
 
 
 
