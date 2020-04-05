@@ -26,14 +26,14 @@ public class Dijkstra {
 
        //initialisation du tableau de visiste, tous non visité
         //initialisation du tableau de etiquette, tous na -1 quand in sont pas d'accés du sommet choisis
-       for(int i = 0; i < graphe.getSommets().size();i++){
-           visite[i]=false;
-           etiquette[i]=-1;
+       for(int i = 1; i <= graphe.getSommets().size();i++){
+           visite[i-1]=false;
+           etiquette[i-1]=-1;
        }
 
        //initialiser les cases deja visité
-       etiquette[sommets] = score;
-       visite[sommets]= true;
+       etiquette[sommets-1] = score;
+       visite[sommets-1]= true;
 
 
        // parcourir les successeur jusqu a que ca soit fini
@@ -41,14 +41,14 @@ public class Dijkstra {
 
            //si il y a des successeur
            if(graphe.getSuccesseursSommet(graphe.getSommet(tmp_sommet)).size()!=0){
-               for(int l = 0; l<graphe.getSuccesseursSommet(graphe.getSommet(tmp_sommet)).size();l++){
+               for(int l = 1; l<=graphe.getSuccesseursSommet(graphe.getSommet(tmp_sommet)).size();l++){
                    //sommet du successeur
-                   sommet_second =graphe.getSuccesseursSommet(graphe.getSommet(tmp_sommet)).get(l);
+                   sommet_second =graphe.getSuccesseursSommet(graphe.getSommet(tmp_sommet)).get(l-1);
                    //cout de l'arc
                    tmps_score = graphe.getArcFromSommets(graphe.getSommet(tmp_sommet), sommet_second).getCout();
 
                    //si sommet du départ egal second sommet (point de départ)
-                   if(sommet_second.id()== sommets ) {
+                   if(sommet_second.id()== sommets || visite[sommet_second.id()-1] ) {
 
                        //si c'est le dernier des succeseurs
                        if(l == graphe.getSuccesseursSommet(graphe.getSommet(tmp_sommet)).size()){
@@ -59,7 +59,7 @@ public class Dijkstra {
                    } else {// si c'est pas egal au sommet
 
                        //si c'est pas le premier de la boucle
-                       if (l != 0) {
+                       if (l != 1) {
                            //Si l'initialisation est suprieur
                            if (score_comparaison > score + tmps_score && sommet_second.id() != sommets) {
                               //on re-initialise
@@ -79,8 +79,8 @@ public class Dijkstra {
                //si on est pas a la fin
                if(parcour__fini==false) {
                    score = score_comparaison;
-                   etiquette[sommet_sauvegarder.id()] = score;
-                   visite[sommet_sauvegarder.id()] = true;
+                   etiquette[sommet_sauvegarder.id()-1] = score;
+                   visite[sommet_sauvegarder.id()-1] = true;
 
                    tmp_sommet = sommet_sauvegarder.id();
                }
@@ -94,8 +94,10 @@ public class Dijkstra {
 
 
         return visite;
+       //graphe.getArcs().get(1).getDepart();
 
     }
+
 
 
 
