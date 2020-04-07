@@ -13,7 +13,6 @@ import java.util.SortedMap;
 public class Dijkstra {
 
 
-    //int s, int[] fs, int[] aps, int[][] couts, int[] d, int[] pred
 
     public static void dijkstra(Graphe graphe, int sommets) {
         int[] tableau_cout = new int[graphe.getSommets().size()];
@@ -44,7 +43,6 @@ public class Dijkstra {
 
         while(tmp.size()!=0){
 
-            System.out.println(tmp.size());
             for(int k=tmp.size()-1; k>=0;k--) {
                 tmp_id=tmp.get(k);
                 tmp.remove(k);
@@ -94,9 +92,6 @@ public class Dijkstra {
 
     }
 
-    public void initialisationDijkstra(){
-
-    }
 
 
 

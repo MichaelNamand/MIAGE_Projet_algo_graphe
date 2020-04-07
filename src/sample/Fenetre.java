@@ -19,6 +19,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -57,6 +58,21 @@ public class Fenetre extends Parent {
         Menu menu = new Menu("Menu");
         Menu menuAlgorithmes = new Menu("Algorithmes");
         Menu menuConsole = new Menu("Console");
+        Menu menuResetCouleur = new Menu("Retablier Couleur");
+
+        MenuItem menuResetCouleurLancer = new MenuItem("Lancer");
+        menuResetCouleurLancer.setOnAction(t -> {
+                    for (int i = 0; i < graphe.getSommets().size(); i++) {
+                        graphe.getSommets().get(i).getCercle().setFill(Color.LIGHTBLUE);
+
+                    }
+
+                    for(int l = 0; l< graphe.getArcs().size(); l++){
+                        graphe.getArcs().get(l).setColor(Color.BLACK);
+                    }
+                }
+                );
+        menuResetCouleur.getItems().add(menuResetCouleurLancer);
 
         // Création des éléments du menu
         MenuItem menuCreer = new MenuItem("Créer un nouveau graphe", new ImageView(imageAjouter));
@@ -165,10 +181,6 @@ public class Fenetre extends Parent {
 
 //de ici j'ai fais un genre de copier coller et j'ai changer le nom pour afficher dans la fenêtre
         MenuItem menuDijkstraLancer = new MenuItem("Lancer");
-
-
-
-
         menuDijkstraLancer.setOnAction(t -> {
 
             ListView<Integer> listview_int = new ListView<>();
@@ -249,7 +261,7 @@ public class Fenetre extends Parent {
         // Ajout des éléments au menu
         menu.getItems().addAll(menuCreer, menuOuvrir, menuEnregistrer);
         menu.getItems().add(new MenuItem("Quitter", new ImageView(imageQuitter)));
-        menuBar.getMenus().addAll(menu, menuAlgorithmes, menuConsole);
+        menuBar.getMenus().addAll(menu, menuAlgorithmes, menuConsole, menuResetCouleur);
 
         // Ajout du menu au layout racine
         border.setTop(menuBar);
