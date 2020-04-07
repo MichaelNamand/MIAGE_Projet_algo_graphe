@@ -3,7 +3,11 @@ package algorithmes;
 import graphe.Arc;
 import graphe.Graphe;
 import graphe.Sommet;
+import javafx.scene.paint.Color;
 
+
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.SortedMap;
 
 public class Dijkstra {
@@ -11,90 +15,86 @@ public class Dijkstra {
 
     //int s, int[] fs, int[] aps, int[][] couts, int[] d, int[] pred
 
-    public static boolean[] dijkstra(Graphe graphe, int sommets) {
-       boolean[] visite = new boolean[graphe.getSommets().size()];      //tabeleau pour savoir si le sommet a était visité
-       int[] etiquette = new int[graphe.getSommets().size()];           //le cout du chemin le plus rapide a partir du sommet choisis
-       int tmps_score=0;
-       int score = 0;
-       boolean parcour__fini = false;
-       int tmp_sommet= sommets;
-       int score_comparaison = 0;
-       Sommet sommet_second ;
-        Sommet sommet_sauvegarder = null;
+    public static void dijkstra(Graphe graphe, int sommets) {
+        int[] tableau_cout = new int[graphe.getSommets().size()];
+        int[] tableau_sommets= new int[graphe.getSommets().size()];
+        int score=0;
+        int tmp_score=0;
+        int tmp_id=0;
+        Sommet sommet_successeur=null;
+        ArrayList<Integer> tmp = new ArrayList<>();
+
+        for(int i=0; i<graphe.getSommets().size();i++){
+            tableau_cout[i]=-1;
+            tableau_sommets[i]=-1;
+            graphe.getSommet(i+1).getCercle().setFill(Color.LIGHTBLUE);
+        }
+
+        for(int i=0; i<graphe.getArcs().size();i++){
+            graphe.getArcs().get(i).setColor(Color.BLACK);
+        }
 
 
 
-       //initialisation du tableau de visiste, tous non visité
-        //initialisation du tableau de etiquette, tous na -1 quand in sont pas d'accés du sommet choisis
-       for(int i = 1; i <= graphe.getSommets().size();i++){
-           visite[i-1]=false;
-           etiquette[i-1]=-1;
-       }
+        tableau_cout[sommets-1]=0;
+        tableau_sommets[sommets-1]=0;
+        tmp.add(graphe.getSommet(sommets).id());
 
-       //initialiser les cases deja visité
-       etiquette[sommets-1] = score;
-       visite[sommets-1]= true;
+        graphe.getSommet(sommets).getCercle().setFill(Color.RED);
 
+        while(tmp.size()!=0){
 
-       // parcourir les successeur jusqu a que ca soit fini
-       while(parcour__fini==false){
-
-           //si il y a des successeur
-           if(graphe.getSuccesseursSommet(graphe.getSommet(tmp_sommet)).size()!=0){
-               for(int l = 1; l<=graphe.getSuccesseursSommet(graphe.getSommet(tmp_sommet)).size();l++){
-                   //sommet du successeur
-                   sommet_second =graphe.getSuccesseursSommet(graphe.getSommet(tmp_sommet)).get(l-1);
-                   //cout de l'arc
-                   tmps_score = graphe.getArcFromSommets(graphe.getSommet(tmp_sommet), sommet_second).getCout();
-
-                   //si sommet du départ egal second sommet (point de départ)
-                   if(sommet_second.id()== sommets || visite[sommet_second.id()-1] ) {
-
-                       //si c'est le dernier des succeseurs
-                       if(l == graphe.getSuccesseursSommet(graphe.getSommet(tmp_sommet)).size()){
-                           parcour__fini=true; // finir la recherche, c'est le dernier des dernier
-                       }
-                       //sinon on ne fait rien
-
-                   } else {// si c'est pas egal au sommet
-
-                       //si c'est pas le premier de la boucle
-                       if (l != 1) {
-                           //Si l'initialisation est suprieur
-                           if (score_comparaison > score + tmps_score && sommet_second.id() != sommets) {
-                              //on re-initialise
-                               score_comparaison = score + tmps_score;
-                               sommet_sauvegarder = sommet_second;
-                           }
-
-                       } else {//initialisé la comparaison
-                           score_comparaison = score + tmps_score;
-                           sommet_sauvegarder = sommet_second;
-                       }
-
-                   }
-
-               }//fin for
-
-               //si on est pas a la fin
-               if(parcour__fini==false) {
-                   score = score_comparaison;
-                   etiquette[sommet_sauvegarder.id()-1] = score;
-                   visite[sommet_sauvegarder.id()-1] = true;
-
-                   tmp_sommet = sommet_sauvegarder.id();
-               }
+            System.out.println(tmp.size());
+            for(int k=tmp.size()-1; k>=0;k--) {
+                tmp_id=tmp.get(k);
+                tmp.remove(k);
 
 
-           } else {
-                parcour__fini=true; //fini de remplire de tableau
-           }
-
-       }
+                for (int l = 0; l < graphe.getSuccesseursSommet(graphe.getSommet(tmp_id)).size(); l++) {
 
 
-        return visite;
-       //graphe.getArcs().get(1).getDepart();
+                    score = tableau_cout[tmp_id - 1];
+                    sommet_successeur = graphe.getSuccesseursSommet(graphe.getSommet(tmp_id)).get(l);
+                    tmp_score = graphe.getArcFromSommets(graphe.getSommet(tmp_id), sommet_successeur).getCout();
+                    score += tmp_score;
+
+
+
+                    if (tableau_cout[sommet_successeur.id() - 1] > score ) {
+
+                        tableau_cout[sommet_successeur.id() - 1] = score;
+                        sommet_successeur.getCercle().setFill(Color.LIGHTBLUE);
+                        graphe.getArcFromSommets(graphe.getSommet(tableau_sommets[sommet_successeur.id()-1]),sommet_successeur).setColor(Color.BLACK);
+
+                        tableau_sommets[sommet_successeur.id() - 1] = graphe.getSommet(tmp_id).id();
+                        sommet_successeur.getCercle().setFill(Color.RED);
+                        graphe.getArcFromSommets(graphe.getSommet(tmp_id),sommet_successeur).setColor(Color.RED);
+
+
+
+
+                    } else if(tableau_cout[sommet_successeur.id() - 1] == -1){
+                        tableau_cout[sommet_successeur.id() - 1] = score;
+                        tableau_sommets[sommet_successeur.id() - 1] = graphe.getSommet(tmp_id).id();
+                        sommet_successeur.getCercle().setFill(Color.RED);
+                        graphe.getArcFromSommets(graphe.getSommet(tmp_id),sommet_successeur).setColor(Color.RED);
+
+                    }
+
+                }
+
+                if(tmp.size()==0){
+                    for(int m=0; m<graphe.getSuccesseursSommet(graphe.getSommet(tmp_id)).size(); m++){
+                        tmp.add(graphe.getSuccesseursSommet(graphe.getSommet(tmp_id)).get(m).id());
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    public void initialisationDijkstra(){
 
     }
 
