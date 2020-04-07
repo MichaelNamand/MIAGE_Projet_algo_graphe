@@ -164,12 +164,47 @@ public class Fenetre extends Parent {
         menuKruskal.getItems().add(menuKruskalLancer);
 
 //de ici j'ai fais un genre de copier coller et j'ai changer le nom pour afficher dans la fenêtre
+        MenuItem menuDijkstraLancer = new MenuItem("Lancer");
+
+
+
+
+        menuDijkstraLancer.setOnAction(t -> {
+
+            ListView<Integer> listview_int = new ListView<>();
+            ObservableList<Integer> items =FXCollections.observableArrayList ();
+
+
+            for(int i =0; i< graphe.getSommets().size();i++){
+                items.add(i+1);
+            }
+
+            listview_int.setItems(items);
+
+            listview_int.setPrefWidth(100);
+            listview_int.setPrefHeight(30);
+            listview_int.setOrientation(Orientation.VERTICAL);
+
+
+            StackPane stackPane2 = new StackPane();
+            stackPane2.getChildren().addAll(listview_int);
+            StackPane.setAlignment(listview_int, Pos.TOP_LEFT);
+            Fenetre.rafraichirInterface();
+            border.setRight(stackPane2);
+            listview_int.setOnMouseClicked(f ->{
+
+                Dijkstra.dijkstra(graphe, listview_int.getSelectionModel().getSelectedIndex()+1);
+            });
+
+
+        });
+        menuDijkstra.getItems().add(menuDijkstraLancer);
 
 
 
 
         MenuItem menuPruferLancer = new MenuItem("Lancer");
-        menuKruskalLancer.setOnAction(t -> {
+        menuPruferLancer.setOnAction(t -> {
 
             StackPane stackPane = new StackPane();
             Button button = new Button("Fermer");
@@ -185,8 +220,6 @@ public class Fenetre extends Parent {
             border.setRight(stackPane);
 
         });
-
-
         menuPrufer.getItems().add(menuPruferLancer);
 
 
@@ -209,7 +242,7 @@ public class Fenetre extends Parent {
 
 
         //Ajouts des éléments au menu algorithme
-        menuAlgorithmes.getItems().addAll(menuRang, menuOrdonnancement, menuDistance, menuTarjan, menuKruskal, menuDijkstra);
+        menuAlgorithmes.getItems().addAll(menuRang, menuOrdonnancement, menuDistance, menuTarjan, menuKruskal, menuDijkstra, menuPrufer);
 
 
 
