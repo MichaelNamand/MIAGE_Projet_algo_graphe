@@ -5,7 +5,10 @@ import graphe.Arc;
 import graphe.Graphe;
 import graphe.Sommet;
 import javafx.animation.PauseTransition;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
@@ -16,6 +19,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -31,6 +35,7 @@ import java.util.Scanner;
 public class Fenetre extends Parent {
     private Graphe graphe;                                  // Graphe courant
     private BorderPane border = new BorderPane();           // BorderPane (élément graphique) gérant la disposition des noeuds de la fenêtre
+    private BorderPane border2 = new BorderPane();           // BorderPane (élément graphique) gérant la disposition des noeuds de la fenêtre
     private ScrollPane scrollPane = new ScrollPane();       // ScrollPane (élément graphique) contenant le graphe
     private Stage primaryStage;                             // Racine de notre application graphique
     public static boolean changementsEffectues = false;     // Boolean indiquant si des changements ont été fait au graphe
@@ -53,6 +58,21 @@ public class Fenetre extends Parent {
         Menu menu = new Menu("Menu");
         Menu menuAlgorithmes = new Menu("Algorithmes");
         Menu menuConsole = new Menu("Console");
+        Menu menuResetCouleur = new Menu("Retablier Couleur");
+
+        MenuItem menuResetCouleurLancer = new MenuItem("Lancer");
+        menuResetCouleurLancer.setOnAction(t -> {
+                    for (int i = 0; i < graphe.getSommets().size(); i++) {
+                        graphe.getSommets().get(i).getCercle().setFill(Color.LIGHTBLUE);
+
+                    }
+
+                    for(int l = 0; l< graphe.getArcs().size(); l++){
+                        graphe.getArcs().get(l).setColor(Color.BLACK);
+                    }
+                }
+                );
+        menuResetCouleur.getItems().add(menuResetCouleurLancer);
 
         // Création des éléments du menu
         MenuItem menuCreer = new MenuItem("Créer un nouveau graphe", new ImageView(imageAjouter));
@@ -71,6 +91,7 @@ public class Fenetre extends Parent {
         Menu menuTarjan = new Menu("CFC selon Tarjan");
         Menu menuKruskal = new Menu("Algorithme de Kruskal");
         Menu menuDijkstra = new Menu("Algorithme de Dijkstra"); //ici aussi j'ai ajouter
+        Menu menuPrufer= new Menu("Algorithme de Prufer");
 
 
         // Création des sous-menus des algorithmes gérant leur lancement
@@ -159,24 +180,56 @@ public class Fenetre extends Parent {
         MenuItem menuDijkstraLancer = new MenuItem("Lancer");
         menuDijkstraLancer.setOnAction(t -> {
 
-            Dijkstra.dijkstra(graphe);
+            ListView<Integer> listview_int = new ListView<>();
+            ObservableList<Integer> items =FXCollections.observableArrayList ();
+
+
+            for(int i =0; i< graphe.getSommets().size();i++){
+                items.add(i+1);
+            }
+
+            listview_int.setItems(items);
+
+            listview_int.setPrefWidth(100);
+            listview_int.setPrefHeight(30);
+            listview_int.setOrientation(Orientation.VERTICAL);
+
 
             StackPane stackPane2 = new StackPane();
+            stackPane2.getChildren().addAll(listview_int);
+            StackPane.setAlignment(listview_int, Pos.TOP_LEFT);
+            Fenetre.rafraichirInterface();
+            border.setRight(stackPane2);
+            listview_int.setOnMouseClicked(f ->{
+
+                Dijkstra.dijkstra(graphe, listview_int.getSelectionModel().getSelectedIndex()+1);
+            });
+
+
+        });
+        menuDijkstra.getItems().add(menuDijkstraLancer);
+
+
+
+
+        MenuItem menuPruferLancer = new MenuItem("Lancer");
+        menuPruferLancer.setOnAction(t -> {
+
+            StackPane stackPane = new StackPane();
             Button button = new Button("Fermer");
             button.setOnMouseClicked(f -> {
                 border.setRight(null);
             });
-            String s = "Arcs qui ne crée pas de cycle, dans l'ordre :\n\n";
-
-            Text text2 = new Text(s);
-            stackPane2.getChildren().addAll(button, text2);
+            String s = "Suite de Prüfer :\n\n" + Prufer.affichePrufer(graphe);
+            Text text3 = new Text(s);
+            stackPane.getChildren().addAll(button, text3);
             StackPane.setAlignment(button, Pos.BOTTOM_CENTER);
-            StackPane.setAlignment(text2, Pos.TOP_LEFT);
+            StackPane.setAlignment(text3, Pos.TOP_LEFT);
             Fenetre.rafraichirInterface();
-            border.setRight(stackPane2);
+            border.setRight(stackPane);
 
         });
-        menuDijkstra.getItems().add(menuDijkstraLancer);
+        menuPrufer.getItems().add(menuPruferLancer);
 
 
 
@@ -198,14 +251,14 @@ public class Fenetre extends Parent {
 
 
         //Ajouts des éléments au menu algorithme
-        menuAlgorithmes.getItems().addAll(menuRang, menuOrdonnancement, menuDistance, menuTarjan, menuKruskal, menuDijkstra);
+        menuAlgorithmes.getItems().addAll(menuRang, menuOrdonnancement, menuDistance, menuTarjan, menuKruskal, menuDijkstra, menuPrufer);
 
 
 
         // Ajout des éléments au menu
         menu.getItems().addAll(menuCreer, menuOuvrir, menuEnregistrer);
         menu.getItems().add(new MenuItem("Quitter", new ImageView(imageQuitter)));
-        menuBar.getMenus().addAll(menu, menuAlgorithmes, menuConsole);
+        menuBar.getMenus().addAll(menu, menuAlgorithmes, menuConsole, menuResetCouleur);
 
         // Ajout du menu au layout racine
         border.setTop(menuBar);
