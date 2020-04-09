@@ -6,47 +6,64 @@ public class Prufer{
 
     public static int[] codagePrufer(Graphe graphe)
     {
-        int[][] matAdj = graphe.getMatAdj();
-        int m = matAdj[0][0];
-        int[] tabPrufer = new int[m - 1];
-        for (int i = 1; i <= m; i++) {
-            matAdj[i][0] = 0;
-            for (int j = 1; j <= m; j++) {
-                if(matAdj[i][j] == 1) {
-                    matAdj[i][0]++;
+        int nbSommet = graphe.getSommets().size();                                  //Nombre de sommets total du graphe
+        int[] suiteDePrufer = new int[graphe.getSommets().size()-2];                //Suite de Prüfer qui est le résultat du codage
+        boolean[] sommetsAParcourir = new boolean[graphe.getSommets().size()];      //Totalité des sommets à parcouir lors du codage
+
+        int nbSommetsAccessibles = 0;                 //Nombre de sommets accessibles à traiter
+        int nbDesommetsParcourus = 0;                 //Nombre de sommets parcourus lors du codage
+        int idPredecesseur = 0;                       //Identifiant du predecesseur du sommet
+        int idSuccesseur = 0;                         //Identifiant du successeur du sommet
+
+        while (nbSommet > 2){           //Tant que le nombre de sommets est supérieur à 2 (condition d'arrêt du codage de Prüfer)
+            for(int k = 1; k <= graphe.getSommets().size(); k++){
+
+                for(int i=0 ; i<graphe.getSuccesseursSommet(graphe.getSommet(k)).size();i++){
+                    if(sommetsAParcourir[graphe.getSuccesseursSommet(graphe.getSommet(k)).get(i).id()-1] == false){
+                        nbSommetsAccessibles++;
+                        idSuccesseur = graphe.getSuccesseursSommet(graphe.getSommet(k)).get(i).id();
+                    }
                 }
+
+                for(int i=0 ; i<graphe.getPredecesseursSommet(graphe.getSommet(k)).size();i++){
+                    if(sommetsAParcourir[graphe.getPredecesseursSommet(graphe.getSommet(k)).get(i).id()-1] == false){
+                        nbSommetsAccessibles++;
+                        idPredecesseur=graphe.getPredecesseursSommet(graphe.getSommet(k)).get(i).id();
+                    }
+                }
+
+                if(nbDesommetsParcourus < graphe.getSommets().size()-2) {
+                    if (nbSommetsAccessibles == 1 && idPredecesseur != 0) {
+                        suiteDePrufer[nbDesommetsParcourus] = idPredecesseur;
+                        sommetsAParcourir[k - 1] = true;
+                        nbSommet--;
+                        nbDesommetsParcourus++;
+
+                    } else if (nbSommetsAccessibles == 1 && idSuccesseur != 0) {
+                        suiteDePrufer[nbDesommetsParcourus] = idSuccesseur;
+                        sommetsAParcourir[k - 1] = true;
+                        nbSommet--;
+                        nbDesommetsParcourus++;
+                    }
+                }
+
+                nbSommetsAccessibles = 0;          //
+                idPredecesseur = 0;                //Réinisialisation des variables pour la prochaine itération
+                idSuccesseur = 0;                  //
             }
+
         }
-        tabPrufer[0] = m - 2;
-        for (int k = 1; k <= m - 2; k++) {
-            int i = 1;
-            for (i = 1; i <= m; i++) {
-                if (matAdj[i][0] == 1) {
-                    matAdj[i][0] = 0;
-                    break;
-                }
-            }
-            for (int j = 1; j <= m; j++) {
-                if(matAdj[i][j] == 1) {
-                    tabPrufer[k] = j;
-                    matAdj[i][j] = 0;
-                    matAdj[j][i] = 0;
-                    matAdj[j][0]--;
-                    break;
-                }
-            }
-        }
-        return tabPrufer;
+        return suiteDePrufer;
     }
 
     public static String affichePrufer(Graphe graphe){
-        int[] tabPrufer = codagePrufer(graphe);
-        String suitePrufer = "{ ";
-        for(int i=0; i < tabPrufer.length-1 ; i++){
-            suitePrufer += tabPrufer[i] + ", ";
+        int[] suiteDePrufer = codagePrufer(graphe);
+        String affichagePrufer = "{ ";
+        for(int i=0; i < suiteDePrufer.length-1 ; i++){
+            affichagePrufer += suiteDePrufer[i] + ", ";
         }
-        suitePrufer += tabPrufer[tabPrufer.length-1] + "}";
-        return  suitePrufer;
+        affichagePrufer += suiteDePrufer[suiteDePrufer.length-1] + "}";
+        return  affichagePrufer;
     }
 
 }
