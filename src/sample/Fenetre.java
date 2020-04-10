@@ -87,13 +87,14 @@ public class Fenetre extends Parent {
         MenuItem menuDistanceAide = new MenuItem("Aide");
         menuDistanceLancer.setOnAction(t -> { Distance.distance(graphe); });
         menuDistanceAide.setOnAction(t ->{
-            ChoiceDialog dialog = new ChoiceDialog();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
 
 
-            dialog.setTitle("Aide");
-            dialog.setContentText("Blabla");
+            alert.setTitle("Aide");
+            alert.setContentText("Cet algorithme sert à calculer le nombre minimum d'arcs d'un chemin allant d'un sommet choisi à l'autre.\n" +
+                    "Cliquez sur la fonction puis sélectionnez le sommet de départ.");
 
-            dialog.showAndWait();
+            alert.showAndWait();
 
         });
         menuDistance.getItems().addAll(menuDistanceLancer, menuDistanceAide);
@@ -104,13 +105,14 @@ public class Fenetre extends Parent {
         menuOrdonnancementLancer.setOnAction(t -> { Ordonnancement.setOrdonnancement(graphe); });
         menuOrdonnancementRetablir.setOnAction(t -> { graphe.retablirAffichage(); });
         menuOrdonnancementAide.setOnAction(t ->{
-            ChoiceDialog dialog = new ChoiceDialog();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
 
 
-            dialog.setTitle("Aide");
-            dialog.setContentText("Blabla");
+            alert.setTitle("Aide");
+            alert.setContentText("Cet algorithme sert à répondre à la problématique suivante : Comment organiser un ensemble de tâches d’un projet pour l’exécuter en un minimum de temps ?\n" +
+                    "Cliquez simplement sur la fonction pour l'exécuter.");
 
-            dialog.showAndWait();
+            alert.showAndWait();
 
         });
         menuOrdonnancement.getItems().addAll(menuOrdonnancementLancer, menuOrdonnancementRetablir,menuOrdonnancementAide);
@@ -125,13 +127,14 @@ public class Fenetre extends Parent {
             }
         });
         menuRangAide.setOnAction(t ->{
-            ChoiceDialog dialog = new ChoiceDialog();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
 
 
-            dialog.setTitle("Aide");
-            dialog.setContentText("Blabla");
+            alert.setTitle("Aide");
+            alert.setContentText("Cet algorithme sert à calculer le rang de chaque sommet, c'est-à-dire le plus long chemin arrivant à ce sommet.\n" +
+                    "Cliquez simplement sur la fonction pour l'exécuter.");
 
-            dialog.showAndWait();
+            alert.showAndWait();
 
         });
         menuRang.getItems().addAll(menuRangLancer, menuRangAide);
@@ -173,13 +176,14 @@ public class Fenetre extends Parent {
             border.setRight(stackPane);
         });
         menuTarjanAide.setOnAction(t ->{
-            ChoiceDialog dialog = new ChoiceDialog();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
 
 
-            dialog.setTitle("Aide");
-            dialog.setContentText("Blabla");
+            alert.setTitle("Aide");
+            alert.setContentText("Cet algorithme sert à déterminer les composantes fortement connexes, c'est-à-dire les ensembles maximaux de sommets dans lequel il existe un chemin entre n'importe quel sommet.\n" +
+                    "Cliquez simplement sur la fonction pour l'exécuter. Le graphe réduit s'affiche à droite, cliquez sur un de ses sommets pour le remettre en place.");
 
-            dialog.showAndWait();
+            alert.showAndWait();
 
         });
         menuTarjan.getItems().addAll(menuTarjanLancer, menuTarjanAide);
@@ -208,13 +212,14 @@ public class Fenetre extends Parent {
 
         });
         menuKruskalAide.setOnAction(t ->{
-            ChoiceDialog dialog = new ChoiceDialog();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
 
 
-            dialog.setTitle("Aide");
-            dialog.setContentText("Blabla");
+            alert.setTitle("Aide");
+            alert.setContentText("Cet algorithme sert à déterminer l'arbre recouvrant minimal du graphe.\n" +
+                    "Cliquez simplement sur la fonction pour l'exécuter.");
 
-            dialog.showAndWait();
+            alert.showAndWait();
 
         });
         menuKruskal.getItems().addAll(menuKruskalLancer, menuKruskalAide);
@@ -252,14 +257,14 @@ public class Fenetre extends Parent {
 
         });
         menuDijkstraAide.setOnAction(t ->{
-            ChoiceDialog dialog = new ChoiceDialog();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
 
 
-            dialog.setTitle("Aide");
-            dialog.setContentText("Cette algorithme sert à trouver le chemin le plus court.'\n' " +
-                    "Cliquez sur la fonction puis lorsque la liste des sommet s'affiche, cliquez sur le sommet pqr le quel vous voulez commencer");
+            alert.setTitle("Aide");
+            alert.setContentText("Cet algorithme sert à trouver le chemin le plus court.'\n' " +
+                    "Cliquez sur la fonction puis lorsque la liste des sommets s'affiche, cliquez sur le sommet par lequel vous souhaitez commencer.");
 
-            dialog.showAndWait();
+            alert.showAndWait();
 
         });
         menuDijkstra.getItems().addAll(menuDijkstraLancer, menuDijkstraAide);
@@ -286,13 +291,15 @@ public class Fenetre extends Parent {
 
         });
         menuPruferAide.setOnAction(t ->{
-            ChoiceDialog dialog = new ChoiceDialog();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
 
 
-            dialog.setTitle("Aide");
-            dialog.setContentText("Blabla");
+            alert.setTitle("Aide");
+            alert.setContentText("Cet algorithme sert à simplifier la lecture de la structure d'un arbre ou un graphe, et retourne donc une séquence unique.\n" +
+                    "Cliquez simplement sur la fonction pour l'exécuter.");
 
-            dialog.showAndWait();
+            alert.showAndWait();
+
 
         });
         menuPrufer.getItems().addAll(menuPruferLancer, menuPruferAide);
