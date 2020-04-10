@@ -19,7 +19,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -58,20 +57,10 @@ public class Fenetre extends Parent {
         Menu menu = new Menu("Menu");
         Menu menuAlgorithmes = new Menu("Algorithmes");
         Menu menuConsole = new Menu("Console");
-        Menu menuResetCouleur = new Menu("Retablier Couleur");
+        Menu menuResetCouleur = new Menu("Rétablir Couleur");
 
         MenuItem menuResetCouleurLancer = new MenuItem("Lancer");
-        menuResetCouleurLancer.setOnAction(t -> {
-                    for (int i = 0; i < graphe.getSommets().size(); i++) {
-                        graphe.getSommets().get(i).getCercle().setFill(Color.LIGHTBLUE);
-
-                    }
-
-                    for(int l = 0; l< graphe.getArcs().size(); l++){
-                        graphe.getArcs().get(l).setColor(Color.BLACK);
-                    }
-                }
-                );
+        menuResetCouleurLancer.setOnAction(t -> { graphe.retablirAffichage(); });
         menuResetCouleur.getItems().add(menuResetCouleurLancer);
 
         // Création des éléments du menu
