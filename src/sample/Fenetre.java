@@ -19,7 +19,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -58,20 +57,10 @@ public class Fenetre extends Parent {
         Menu menu = new Menu("Menu");
         Menu menuAlgorithmes = new Menu("Algorithmes");
         Menu menuConsole = new Menu("Console");
-        Menu menuResetCouleur = new Menu("Retablir Couleur");
+        Menu menuResetCouleur = new Menu("Rétablir Couleur");
 
         MenuItem menuResetCouleurLancer = new MenuItem("Lancer");
-        menuResetCouleurLancer.setOnAction(t -> {
-                    for (int i = 0; i < graphe.getSommets().size(); i++) {
-                        graphe.getSommets().get(i).getCercle().setFill(Color.LIGHTBLUE);
-
-                    }
-
-                    for(int l = 0; l< graphe.getArcs().size(); l++){
-                        graphe.getArcs().get(l).setColor(Color.BLACK);
-                    }
-                }
-                );
+        menuResetCouleurLancer.setOnAction(t -> { graphe.retablirAffichage(); });
         menuResetCouleur.getItems().add(menuResetCouleurLancer);
 
         // Création des éléments du menu
@@ -172,10 +161,7 @@ public class Fenetre extends Parent {
             });
             grapheReduit.getPane().setPrefWidth(300);
             grapheReduit.getPane().setPrefHeight(400);
-            for (Arc arc : grapheReduit.getArcs()) {
-                arc.getArrow().update();
-                arc.setLine();
-            }
+            for (Arc arc : grapheReduit.getArcs()) { arc.setLine(); }
             Text info  = new Text("Graphe réduit : Du à un bug d'affichage, \ndéplacer un sommet pour remettre en \nplace leurs arcs");
             stackPane.getChildren().addAll(grapheReduit, button, info);
 
@@ -485,7 +471,8 @@ public class Fenetre extends Parent {
                 // Puis on écrit les sommets dans le fichier
                 for (Sommet s : graphe.getSommets()) {
                     try {
-                        out.write("S/" + s.id() + "/" + s.getX() + "/" + s.getY() + "/" + s.getRang() + "/" + s.getValeur());
+                        out.write("S/" + s.id() + "/" + (s.getX()) + "/" + (s.getY())
+                                + "/" + s.getRang() + "/" + s.getValeur());
                         out.newLine();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -510,6 +497,7 @@ public class Fenetre extends Parent {
                 }
             }
         }
+        Fenetre.changementsEffectues = false;
     }
 
     /**
@@ -607,6 +595,8 @@ public class Fenetre extends Parent {
 
         flow.getChildren().addAll(bSommet, bArc, vBox, cbRangsSommets);
         border.setBottom(flow);
+
+        Fenetre.changementsEffectues = false;
     }
 
     public Alert getConfirmationQuitter(Graphe g, String message) {

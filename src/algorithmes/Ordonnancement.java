@@ -33,8 +33,15 @@ public class Ordonnancement {
             }
         }
         int idSommetMax = 0;
-        for (int j = 1; j <= n; j++) if (idSommetMax < L[j]) idSommetMax = j;
+        int coutMax = 0;
+        for (int j = 1; j <= n; j++) {
+            if (coutMax < L[j]) {
+                coutMax = L[j];
+                idSommetMax = j;
+            }
+        }
         graphe.getSommet(idSommetMax).getCercle().setFill(Color.LIGHTGREEN);
+
         // Affichage du chemin critique
         int[] nbArcSuivDashedSommets = new int[n + 1];
         for (Sommet sommet : graphe.getSommets()) {

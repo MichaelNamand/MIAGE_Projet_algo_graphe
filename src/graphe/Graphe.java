@@ -60,11 +60,11 @@ public class Graphe extends Parent {
                         TextInputDialog dialog = Fenetre.getTextInputFromDialog("Renseignez le nom du sommet :");
                         dialog.showAndWait().ifPresent(nomSommet -> {
                             // Ajout du sommet dans notre liste sommets et dans le pane
-                            ajouterSommet(new Sommet(idIncrement, t.getSceneX(), t.getSceneY(), -1, nomSommet, Graphe.this));
+                            ajouterSommet(new Sommet(idIncrement, t.getX() - Sommet.SOMMET_RADIUS, t.getY() - Sommet.SOMMET_RADIUS, -1, nomSommet, Graphe.this));
                         });
                     } else {
                         // Ajout du sommet dans notre liste sommets et dans le pane
-                        ajouterSommet(new Sommet(idIncrement, t.getSceneX(), t.getSceneY(), -1, "Sans nom", Graphe.this));
+                        ajouterSommet(new Sommet(idIncrement, t.getX() - Sommet.SOMMET_RADIUS, t.getY() - Sommet.SOMMET_RADIUS, -1, "Sans nom", Graphe.this));
                     }
                     Fenetre.changementsEffectues = true;
                     // A chaque création d'un sommet, idIncrement s'incrémente pour définir le nouvel id d'un futur sommet créé
@@ -298,10 +298,7 @@ public class Graphe extends Parent {
             s.setStyleSommet(afficherNomsSommetsEnclenches);
         }
         Fenetre.rafraichirInterface();
-        for (Arc a : arcs) {
-            a.setLine();
-            a.getArrow().update();
-        }
+        for (Arc a : arcs) { a.setLine(); }
         setAfficherCoutsArcsEnclenches(isAfficherCoutsArcsEnclenches());
     }
 
@@ -329,7 +326,6 @@ public class Graphe extends Parent {
                 a.masquerCouts();
             }
         }
-        Fenetre.rafraichirInterface();
     }
 
     public boolean isCreationSommetsEnclenches() {

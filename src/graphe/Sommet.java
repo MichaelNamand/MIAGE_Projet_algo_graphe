@@ -31,6 +31,7 @@ public class Sommet extends StackPane {
 
     static public double SOMMET_RADIUS = 20;    // Diamètre du cercle du sommet
     public double x, y;                         // Coordonnées du sommet dans le graphe
+    public double sx, sy;                         // Coordonnées du sommet dans la scene
     private Circle cercle;                      // Cercle (élément graphique) composant le sommet
     private Text nomAffichage;                  // Texte (élément graphique) affichant la valeur / id du sommet
     private Text dureeAffichage;                // Texte (élément graphique) affichant la durée / longueur du sommet
@@ -45,8 +46,6 @@ public class Sommet extends StackPane {
         this.valeur = valeur;
         this.rang = rang;
 
-        // Coordonnées du sommet dans le graphe
-        this.x = x; this.y = y;
         // Texte affiché sur le sommet (id ou valeur)
         nomAffichage = new Text(graphe.isAfficherNomsSommetsEnclenches() ? valeur : id + "");
 
@@ -75,26 +74,26 @@ public class Sommet extends StackPane {
 
         setCursor(Cursor.HAND);
         setOnMousePressed((t) -> {
-            this.x = t.getSceneX();
-            this.y = t.getSceneY();
+            this.sx = t.getSceneX();
+            this.sy = t.getSceneY();
         });
         setPrefHeight(44);
         // Gestion du déplacement d'un sommet. On doit mettre à jour non seulement la position du sommet mais aussi ses
         // éventuels arcs.
         setOnMouseDragged((t) -> {
-            double offsetX = t.getSceneX() - this.x;
-            double offsetY = t.getSceneY() - this.y;
+            double offsetSX = t.getSceneX() - this.sx;
+            double offsetSY = t.getSceneY() - this.sy;
 
-            setLayoutX(getLayoutX() + offsetX);
-            setLayoutY(getLayoutY() + offsetY);
+            setLayoutX(getLayoutX() + offsetSX);
+            setLayoutY(getLayoutY() + offsetSY);
 
-            this.x = t.getSceneX();
-            this.y = t.getSceneY();
+            this.sx = t.getSceneX();
+            this.sy = t.getSceneY();
 
-            for (Arc arc : graphe.getArcs()) {
-                arc.setLine();
-                arc.getArrow().update();
-            }
+            this.x += + offsetSX;
+            this.y += offsetSY;
+
+            for (Arc arc : graphe.getArcs()) { arc.setLine(); }
             Fenetre.changementsEffectues = true;
         });
         // Création du menu contextuel lorsqu'on clique droit sur un sommet
@@ -174,8 +173,11 @@ public class Sommet extends StackPane {
             }
         });
 
-        setLayoutX(x - getSommetRadius());
-        setLayoutY(y - getSommetRadius() * 2);
+
+        // Coordonnées du sommet dans le graphe
+        this.x = x; this.y = y;
+        setLayoutX(x);
+        setLayoutY(y);
     }
 
     /**
