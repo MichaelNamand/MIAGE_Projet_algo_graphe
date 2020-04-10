@@ -34,7 +34,6 @@ import java.util.Scanner;
 public class Fenetre extends Parent {
     private Graphe graphe;                                  // Graphe courant
     private BorderPane border = new BorderPane();           // BorderPane (élément graphique) gérant la disposition des noeuds de la fenêtre
-    private BorderPane border2 = new BorderPane();           // BorderPane (élément graphique) gérant la disposition des noeuds de la fenêtre
     private ScrollPane scrollPane = new ScrollPane();       // ScrollPane (élément graphique) contenant le graphe
     private Stage primaryStage;                             // Racine de notre application graphique
     public static boolean changementsEffectues = false;     // Boolean indiquant si des changements ont été fait au graphe
