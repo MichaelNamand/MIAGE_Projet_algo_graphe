@@ -58,7 +58,7 @@ public class Fenetre extends Parent {
         Menu menu = new Menu("Menu");
         Menu menuAlgorithmes = new Menu("Algorithmes");
         Menu menuConsole = new Menu("Console");
-        Menu menuResetCouleur = new Menu("Retablier Couleur");
+        Menu menuResetCouleur = new Menu("Retablir Couleur");
 
         MenuItem menuResetCouleurLancer = new MenuItem("Lancer");
         menuResetCouleurLancer.setOnAction(t -> {
@@ -96,16 +96,39 @@ public class Fenetre extends Parent {
 
         // Création des sous-menus des algorithmes gérant leur lancement
         MenuItem menuDistanceLancer = new MenuItem("Lancer");
+        MenuItem menuDistanceAide = new MenuItem("Aide");
         menuDistanceLancer.setOnAction(t -> { Distance.distance(graphe); });
-        menuDistance.getItems().add(menuDistanceLancer);
+        menuDistanceAide.setOnAction(t ->{
+            ChoiceDialog dialog = new ChoiceDialog();
+
+
+            dialog.setTitle("Aide");
+            dialog.setContentText("Blabla");
+
+            dialog.showAndWait();
+
+        });
+        menuDistance.getItems().addAll(menuDistanceLancer, menuDistanceAide);
 
         MenuItem menuOrdonnancementLancer = new MenuItem("Lancer");
         MenuItem menuOrdonnancementRetablir = new MenuItem("Rétablir");
+        MenuItem menuOrdonnancementAide = new MenuItem("Aide");
         menuOrdonnancementLancer.setOnAction(t -> { Ordonnancement.setOrdonnancement(graphe); });
         menuOrdonnancementRetablir.setOnAction(t -> { graphe.retablirAffichage(); });
-        menuOrdonnancement.getItems().addAll(menuOrdonnancementLancer, menuOrdonnancementRetablir);
+        menuOrdonnancementAide.setOnAction(t ->{
+            ChoiceDialog dialog = new ChoiceDialog();
+
+
+            dialog.setTitle("Aide");
+            dialog.setContentText("Blabla");
+
+            dialog.showAndWait();
+
+        });
+        menuOrdonnancement.getItems().addAll(menuOrdonnancementLancer, menuOrdonnancementRetablir,menuOrdonnancementAide);
 
         MenuItem menuRangLancer = new MenuItem("Lancer");
+        MenuItem menuRangAide = new MenuItem("Aide");
         menuRangLancer.setOnAction(t -> {
             Rang.setRang(graphe);
             graphe.setAfficherRangSommetsEnclenches(true);
@@ -113,9 +136,20 @@ public class Fenetre extends Parent {
                 cbRangsSommets.setSelected(true);
             }
         });
-        menuRang.getItems().add(menuRangLancer);
+        menuRangAide.setOnAction(t ->{
+            ChoiceDialog dialog = new ChoiceDialog();
+
+
+            dialog.setTitle("Aide");
+            dialog.setContentText("Blabla");
+
+            dialog.showAndWait();
+
+        });
+        menuRang.getItems().addAll(menuRangLancer, menuRangAide);
 
         MenuItem menuTarjanLancer = new MenuItem("Lancer");
+        MenuItem menuTarjanAide = new MenuItem("Aide");
         menuTarjanLancer.setOnAction(t -> {
             // L'algorithme tarjan renvoie le graphe réduit
             Graphe grapheReduit = Tarjan.tarjan(graphe);
@@ -153,9 +187,20 @@ public class Fenetre extends Parent {
             Fenetre.rafraichirInterface();
             border.setRight(stackPane);
         });
-        menuTarjan.getItems().add(menuTarjanLancer);
+        menuTarjanAide.setOnAction(t ->{
+            ChoiceDialog dialog = new ChoiceDialog();
+
+
+            dialog.setTitle("Aide");
+            dialog.setContentText("Blabla");
+
+            dialog.showAndWait();
+
+        });
+        menuTarjan.getItems().addAll(menuTarjanLancer, menuTarjanAide);
 
         MenuItem menuKruskalLancer = new MenuItem("Lancer");
+        MenuItem menuKruskalAide = new MenuItem("Aide");
         menuKruskalLancer.setOnAction(t -> {
             //Kruskal renvoie un tableau d'arcs
             Arc[] arcs = Kruskal.kruskal(graphe);
@@ -177,10 +222,21 @@ public class Fenetre extends Parent {
             border.setRight(stackPane);
 
         });
-        menuKruskal.getItems().add(menuKruskalLancer);
+        menuKruskalAide.setOnAction(t ->{
+            ChoiceDialog dialog = new ChoiceDialog();
+
+
+            dialog.setTitle("Aide");
+            dialog.setContentText("Blabla");
+
+            dialog.showAndWait();
+
+        });
+        menuKruskal.getItems().addAll(menuKruskalLancer, menuKruskalAide);
 
 //de ici j'ai fais un genre de copier coller et j'ai changer le nom pour afficher dans la fenêtre
         MenuItem menuDijkstraLancer = new MenuItem("Lancer");
+        MenuItem menuDijkstraAide = new MenuItem("Aide");
         menuDijkstraLancer.setOnAction(t -> {
 
             ListView<Integer> listview_int = new ListView<>();
@@ -210,12 +266,24 @@ public class Fenetre extends Parent {
 
 
         });
-        menuDijkstra.getItems().add(menuDijkstraLancer);
+        menuDijkstraAide.setOnAction(t ->{
+            ChoiceDialog dialog = new ChoiceDialog();
+
+
+            dialog.setTitle("Aide");
+            dialog.setContentText("Cette algorithme sert à trouver le chemin le plus court.'\n' " +
+                    "Cliquez sur la fonction puis lorsque la liste des sommet s'affiche, cliquez sur le sommet pqr le quel vous voulez commencer");
+
+            dialog.showAndWait();
+
+        });
+        menuDijkstra.getItems().addAll(menuDijkstraLancer, menuDijkstraAide);
 
 
 
 
         MenuItem menuPruferLancer = new MenuItem("Lancer");
+        MenuItem menuPruferAide = new MenuItem("Aide");
         menuPruferLancer.setOnAction(t -> {
 
             StackPane stackPane = new StackPane();
@@ -232,7 +300,17 @@ public class Fenetre extends Parent {
             border.setRight(stackPane);
 
         });
-        menuPrufer.getItems().add(menuPruferLancer);
+        menuPruferAide.setOnAction(t ->{
+            ChoiceDialog dialog = new ChoiceDialog();
+
+
+            dialog.setTitle("Aide");
+            dialog.setContentText("Blabla");
+
+            dialog.showAndWait();
+
+        });
+        menuPrufer.getItems().addAll(menuPruferLancer, menuPruferAide);
 
 
 
