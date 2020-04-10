@@ -295,7 +295,7 @@ public class Fenetre extends Parent {
 
 
             alert.setTitle("Aide");
-            alert.setContentText("Cet algorithme sert à simplifier la lecture de la structure d'un arbre ou un graphe, et retourne donc une séquence unique.\n" +
+            alert.setContentText("Cet algorithme sert à simplifier la lecture de la structure d'un arbre UNIQUEMENT, et retourne donc une séquence unique.\n" +
                     "Cliquez simplement sur la fonction pour l'exécuter.");
 
             alert.showAndWait();
